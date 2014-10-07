@@ -9,7 +9,10 @@ params: tty_id (terminal id to copy from),
 returns: the number of bytes actually copied on success, ERROR else
 */
 
-int ttyRead(int tty_id, void *buf, int len){
+void kernelTtyRead(UserContext *){
+	int tty_id = UserContext.regs[0];
+	void *buf = UserContext.regs[1];
+	int len = UserContext.regs[2];
 	//while theres no input to be returned
 	//block the calling process
 
@@ -22,7 +25,7 @@ int ttyRead(int tty_id, void *buf, int len){
 	//else 
 	//call ttyRead on input for next set of len bytes
 
-	//return number of bytes actually copies
+	//regs[0] = number of bytes actually copies
 
 
 }

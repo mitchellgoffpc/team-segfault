@@ -9,7 +9,10 @@ params: tty_id (terminal to write to),
 returns: number of bytes written on success, ERROR else
 */
 
-int ttyWrite(int tty_id, void *buf, int len){
+void kernelTtyWrite(UserContext *){
+	int tty_id = UserContext.regs[0];
+	void *buf = UserContext.regs[1];
+	int len = UserContext.regs[2];
 	//while we are not finished writing
 		//block the calling process
 

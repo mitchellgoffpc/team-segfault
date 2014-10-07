@@ -7,12 +7,11 @@ params: none
 returns: 0 if child process was created successfully, ERROR if not
 */
 
-int fork(void) {
+void kernelFork(UserContext *) {
 	//save user context from when the user executed TRAP_KERNEL to call fork
 	//generate new process ID
 	//allocate space for new PCB
 	//create kernel context for child process (copied from parent's kernel context)
 	//allocate space for child process
 	//copy parent's memory space contents
-	//return 0 upon success
 }

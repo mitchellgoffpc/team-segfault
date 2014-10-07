@@ -10,7 +10,8 @@ params: status_ptr (where to save the child's exit status)
 returns: process ID of child
 */
 
-int wait(int* status_ptr) {
+void kernelWait(UserContext *) {
+	int* status_ptr = UserContext.regs[0];
 	//grab process ID
 	//grab exit status of child
 	//save child's exit status in status_ptr
@@ -20,6 +21,6 @@ int wait(int* status_ptr) {
 
 	//block the calling process until the child returns
 
-	//return process ID of child process, ERROR upon failure
+	//regs[0] = process ID of child process, ERROR upon failure
 
 }
