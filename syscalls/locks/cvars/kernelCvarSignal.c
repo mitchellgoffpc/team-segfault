@@ -10,8 +10,6 @@ void kernelCvarSignal(UserContext *) {
 	int cvar_id = UserContext.regs[0];
 
 	
-	//while the condition is not true
-		//wait
-	//now that the condition is true
-	//signal the condition variable at cvar_id
+	//notify the waiter that condition is now true
+	//put that waiter on the ready queue
 }
