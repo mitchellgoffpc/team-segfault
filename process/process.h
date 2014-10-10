@@ -11,27 +11,13 @@
 
 /* =============================== *
 
-  			  Includes
+  			 Includes
 
  * =============================== */
 
 #include <limits.h>
 #include "list.h"
-#include "waitqueue.h"
-
-
-
-
-/* =============================== *
-
-  		Forward Declarations
-
- * =============================== */
-
-struct ProcessInfo;
-struct ProcessDescriptor;
-
-typedef int pid_t;
+#include "../sync/waitqueue.h"
 
 
 
@@ -53,36 +39,48 @@ int MAX_PID = INT_MAX;
 
  * =============================== */
 
+struct ProcessInfo;
+struct ProcessDescriptor;
+
+typedef struct ProcessInfo ProcessInfo;
+typedef struct ProcessDescriptor ProcessDescriptor;
+
+typedef unsigned int PID;
+
+
+
+
 /*
   The ProcessState enum describes all the possible states that a process
   can be in.
 
-  TASK_RUNNING: 	  The process is currently running or waiting to be run.
-  TASK_INTERRUPTABLE: The process is sleeping until some condition becomes
-  					  true. This is useful when waiting for hardware interrupt.
+  PROCESS_RUNNING: The process is currently running or waiting to be run.
+  PROCESS_WAITING: The process is sleeping until some condition becomes
+  				   true. This is useful when waiting for a hardware interrupt
+                   or when putting a process on a waitqueue
 
-  TASK_STOPPED:		  The process has been stopped. This occurs when the process
-  					  is sent a SIG_STOP or SIG_KSTOP signal, and is useful for
-  					  job control in the shell, amongst other things
+  PROCESS_STOPPED: The process has been stopped. This occurs when the process
+  				   is sent a SIG_STOP or SIG_KSTOP signal, and is useful for
+  				   job control in the shell, amongst other things
 
-  TASK_ZOMBIE:		  The process has been killed, but it's parent hasn't yet
-  					  issued a waitpid()-like syscall to get information from
-  					  the child's ProcessDescriptor, so we can't get rid of the
-  					  PCB yet.
+  PROCESS_ZOMBIE:  The process has been killed, but it's parent hasn't yet
+  				   issued a waitpid()-like syscall to get information from
+  				   the child's ProcessDescriptor, so we can't get rid of the
+  				   PCB yet.
 
-  TASK_DEAD:		  The process has been killed, and its parent has just issued
-  					  a waitpid()-like syscall to get information from the child's
-  					  ProcessDescriptor. This state is used to avoid race
-  					  conditions caused by multiple threads issuing waitpid()
-  					  -like syscalls on the same process.
+  PROCESS_DEAD:	   The process has been killed, and its parent has just issued
+  				   a waitpid()-like syscall to get information from the child's
+  				   ProcessDescriptor. This state is used to avoid race
+  				   conditions caused by multiple threads issuing waitpid()
+  				   -like syscalls on the same process.
 */
 
 enum ProcessState {
-	TASK_RUNNING=0,
-	TASK_INTERRUPTABLE=1,
-	TASK_STOPPED=2,
-	TASK_ZOMBIE=4,
-	TASK_DEAD=5
+    PROCESS_RUNNING=0,
+	PROCESS_WAITING=1,
+	PROCESS_STOPPED=2,
+	PROCESS_ZOMBIE=4,
+	PROCESS_DEAD=8
 };
 
 
@@ -95,7 +93,7 @@ enum ProcessState {
 */
 
 struct ProcessInfo {
-	ProcessDescriptor* descriptor;
+    ProcessDescriptor* descriptor;
 };
 
 
@@ -129,7 +127,7 @@ struct ProcessInfo {
 */
 
 struct ProcessDescriptor {
-	pid_t pid;
+	PID pid;
 
 	ProcessState state;
 	ProcessInfo* info;
@@ -142,7 +140,7 @@ struct ProcessDescriptor {
 	pid_t thread_leader_pid;
 
 	LinkedListNode process_list;
-	LinkedListNode waitqueue_list;
+	WaitQueueNode *waitqueue;
 };
 
 
@@ -154,7 +152,7 @@ struct ProcessDescriptor {
 */
 
 union ProcessControlBlock {
-	struct ProcessInfo info;
+	ProcessInfo info;
 	unsigned long stack[2048]; /* 1024 for 4KB stacks */
 };
 

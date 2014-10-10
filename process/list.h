@@ -20,6 +20,8 @@ struct LinkedListNode {
 	struct LinkedListNode *next, *prev;
 };
 
+typedef struct LinkedListNode LinkedListNode;
+
 
 
 /*
@@ -47,21 +49,27 @@ struct LinkedListNode {
   Some macros and functions to provide basic linked list functionality.
 */
 
-// Initialize a new linked list with one node
-#define initializeLinkedList(name) { &(name), &(name) }
+// Statically initialize a new linked list node
+#define linkedListNode(name) { &(name), &(name) }
 
-// Create a new list node
+// Dynamically initialize a new linked list node
+#define linkedListNodeInit(name) \
+  	(name)->prev = (name); \
+  	(name)->next = (name)
+
+// Create a new linked list node variable
 #define newLinkedListNode(name) \
-	struct LinkedListNode name = initializeLinkedList(name)
+	LinkedListNode name = linkedListNode(name)
+
 
 
 // Test whether a list is empty
-static inline int listIsEmpty(struct LinkedListNode *head) {
+inline int listIsEmpty(LinkedListNode *head) {
 	return head->next == head;
 }
 
 // Insert a new node into the list
-static inline void insertNode(struct LinkedListNode *node, struct LinkedListNode *head) {
+static inline void insertNode(LinkedListNode *node, LinkedListNode *head) {
 	head->next->prev = node;
 	node->next = head->next;
 	node->prev = head;
@@ -69,13 +77,13 @@ static inline void insertNode(struct LinkedListNode *node, struct LinkedListNode
 }
 
 // Remove a node from the list
-static inline void removeNode(struct LinkedListNode *node) {
+static inline void removeNode(LinkedListNode *node) {
 	node->prev->next = node->next;
 	node->next->prev = node->prev;
 }
 
 // Splice list $second into list $first
-static inline void spliceLinkedLists(struct LinkedListNode *second, struct LinkedListNode *first) {
+static inline void spliceLinkedLists(LinkedListNode *second, LinkedListNode *first) {
 	if (!listIsEmpty(second)) {
 		second->prev->next = first;
 		second->next->prev = first->prev;
@@ -92,25 +100,25 @@ static inline void spliceLinkedLists(struct LinkedListNode *second, struct Linke
 */
 
 // Add a node to the beginning of the list
-static inline void addFirstNode(struct LinkedListNode *node, struct LinkedListNode *head) {
+static inline void addFirstNode(LinkedListNode *node, LinkedListNode *head) {
 	insertNode(node, head);
 }
 
 // Add a node to the beginning of the list
-static inline void addLastNode(struct LinkedListNode *node, struct LinkedListNode *head) {
+static inline void addLastNode(LinkedListNode *node, LinkedListNode *head) {
 	insertNode(node, head->prev);
 }
 
 // Remove the node at the beginning of the list
-static inline struct LinkedListNode* removeFirstNode(struct LinkedListNode *head) {
-	struct LinkedListNode* node = head->next;
+static inline LinkedListNode* removeFirstNode(LinkedListNode *head) {
+	LinkedListNode* node = head->next;
 	removeNode(node);
 	return node;
 }
 
 // Remove the node at the end of the list
-static inline struct LinkedListNode* removeLastNode(struct LinkedListNode *head) {
-	struct LinkedListNode* node = head->prev;
+static inline LinkedListNode* removeLastNode(LinkedListNode *head) {
+	LinkedListNode* node = head->prev;
 	removeNode(node);
 	return node;
 }
@@ -194,13 +202,13 @@ static inline struct LinkedListNode* removeLastNode(struct LinkedListNode *head)
 
 // Iterate over every node in the list
 #define forEachNode(pos, head) \
-	for (struct LinkedListNode* pos = (head)->next; \
+	for (LinkedListNode* pos = (head)->next; \
 		pos != (head); \
 		pos = pos->next)
 
 // Iterate backwards over every node in the list
 #define forEachNodeReversed(pos, head) \
-	for (struct LinkedListNode* pos = (head)->prev; \
+	for (LinkedListNode* pos = (head)->prev; \
 		pos != (head); \
 		pos = pos->prev)
 
