@@ -52,7 +52,8 @@ void kernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *uctxt) {
 
 	//build initial page tables for Region0 and Region1
 
-	//enable virtual memory
+	//enable virtual memory (from p.28)
+	WriteRegister(REG_VM_ENABLE, 1);
 
 	//create an idle process that executes the Pause machine instruction 
 	DoIdle();
