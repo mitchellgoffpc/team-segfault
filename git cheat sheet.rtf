@@ -1,0 +1,196 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fnil\fcharset0 Tahoma;\f1\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red25\green25\blue25;\red255\green255\blue255;\red0\green0\blue233;
+\red255\green236\blue130;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc0\levelnfcn0\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{decimal\}.}{\leveltext\leveltemplateid1\'02\'00.;}{\levelnumbers\'01;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720
+
+\f0\fs30 \cf2 \cb3 Hello, CS58ers!\
+\
+Our sysadmins have created Git repositories for the Yalnix projects. If you are not familiar with Git, it would be worth learning quickly.\
+This email contains a brief high-level
+\b  introduction to git,
+\b0 \'a0
+\b resources 
+\b0 for learning Git, and 
+\b connection information
+\b0  for your Dartmouth repositories, which you will be storing your Yalnix work in. If you have any git issues or questions send us an email or come to the office hours.\
+\
+\
+\pard\pardeftab720
+
+\b\fs32 \cf2 Introduction to Git
+\b0 \
+\pard\pardeftab720
+
+\fs30 \cf2 \
+Git is a Distributed Version Control System. This means that when you make a copy of a repository (clone) you obtain a copy of any change the repository has ever undergone. There\'92s many reasons for this, but a couple are 1. Most operations work offline 2. Paying costs upfront 3. Redundancy, as every team member has all of the history\
+\
+\pard\pardeftab720
+
+\b \cf2 Vocabulary:
+\b0 \
+-\'a0
+\b Staging area
+\b0 : A virtual place that you can tell git which files or changes within files you want to permanently add to the repository.\
+-\'a0
+\b Commit
+\b0 : A set of changes, plus a time/date, author, and message describing the changes.\
+-\'a0
+\b Master
+\b0 : The default branch of a repository.\
+-\'a0
+\b Branch
+\b0 : A series of commits that have a shared goal. Many people just use one branch, master.\
+-\'a0
+\b Remote
+\b0 : A repository that exists somewhere else. You can push and pull from remote repositories, and then can be http:// urls, git:// urls, other folders on your filesystem, etc. You can have many remotes.\
+-\'a0
+\b origin:\'a0
+\b0 The default remote. Most people have just one, or a select few remote repositories.\
+-\'a0
+\b Repository
+\b0 : A \'93directory\'94 that contains all of the changes made, usually corresponding with a specific project.\
+\
+\
+A few other differences make an appearance in the workflow:\
+\
+
+\b Alice edits a file
+\b0 \
+Alice edits file1. She wants to make the changes appear in the upstream repository. To do so, she first\'a0\
+\'93stages\'94 it using \'93git add file1\'94. This tells git that file1 contains changes she would like to commit.\'a0\
+\
+She then uses \'93git commit\'94 to permanently store the staged changes in the repository.\
+Git will ask her for a message in her editor, and when she saves/exits it will store the message, her email, the date+time, and the changes permanently in the repository log (\'93git log\'94)\
+\
+Alice now needs to tell the repository to use Dartmouth\'92s git server. As she is on team 1, she runs "git remote add origin\'a0{\field{\*\fldinst{HYPERLINK "https://git.cs.dartmouth.edu/cs58-F14-team1.git%E2%80%9D"}}{\fldrslt \cf4 \ul \ulc4 https://git.cs.dartmouth.edu/cs58-F14-team1.git\'94}}.\
+\
+She now runs \'93git push -u origin master\'94 to push the master branch to the remote repository, on Dartmouth\'92s git server.\
+\
+\
+
+\b Bob gets her changes
+\b0 \
+Bob is now able to \'93clone\'94 the repository to a new directory, or \'93pull\'94 Alice\'92s changes from the server.\
+\
+To clone, Bob runs \'93git clone\'a0{\field{\*\fldinst{HYPERLINK "https://git.cs.dartmouth.edu/cs58-F14-team1.git%E2%80%9D"}}{\fldrslt \cf4 \ul \ulc4 https://git.cs.dartmouth.edu/cs58-F14-team1.git\'94}}.\
+\
+To pull her changes into an existing git repository with some of the team\'92s changes he must have a remote set to Dartmouth\'92s server. He can then run \'93git pull -u origin master\'94.\
+\
+
+\b Merge conflicts
+\b0 \
+Most people will run into merge conflicts eventually, and they always suck.\
+\
+This usually occurs when two people start at the same commit in a repository and both make changes and thus commits to the same file. Whoever pushes to the remote first creates the \'93official\'94 history. The person who pushes second is not allowed to push \'97 that would rewrite history. Most of git commands do not rewrite history. Instead, the second person must \'93pull\'94 the changes, and then \'93push\'94.\
+\
+In this hypothetical scenario, it\'92s not that simple \'97 in this example, there\'a0is\'a0a merge conflict, and git requires you to act in order to fix it. Git can solve many merge conflict automatically, but changes to the same line usually require manual intervention.\'a0\
+\
+Included below is a portion of the Pro Git book, taken from Chapter 3 Section 2 ({\field{\*\fldinst{HYPERLINK "http://git-scm.com/book/"}}{\fldrslt \cf4 \ul \ulc4 http://git-scm.com/book/}}, CC BY-NC-SA 3.0) showing a simple merge conflict.\
+\pard\pardeftab720
+
+\f1 \cf2 <<<<<<< HEAD\
+<div id="footer">contact : {\field{\*\fldinst{HYPERLINK "mailto:email.support@github.com"}}{\fldrslt \cf4 \ul \ulc4 email.support@github.com}}</div>\
+=======\
+<div id="footer">\
+  please contact us at {\field{\*\fldinst{HYPERLINK "mailto:support@github.com"}}{\fldrslt \cf4 \ul \ulc4 support@github.com}}\
+</div>\
+>>>>>>> iss53\
+\pard\pardeftab720
+
+\f0 \cf2 Two different commits modified the same line(s) in a file. Git has automatically placed seven angle brackets and equals signs marking the differing portions of the files. In order to resolve the conflict, you manually edit the file, remove the markers, pick which version is \'93more up to date\'94 (subjective), run \'93git add\'94 on the file to mark it as \'93resolved\'94, and then \'93git commit\'94.\
+\
+\
+\
+\pard\pardeftab720
+
+\b\fs32 \cf2 Resources for learning Git
+\b0 \'a0-\'a0\
+\pard\pardeftab720
+
+\fs30 \cf2 \
+Git from the bottom up \'97\'a0{\field{\*\fldinst{HYPERLINK "http://ftp.newartisans.com/pub/git.from.bottom.up.pdf"}}{\fldrslt \cf4 \ul \ulc4 http://ftp.newartisans.com/pub/git.from.bottom.up.pdf}}\
+Great tutorial that walks through most of git\'92s internals, which can help with understanding\'a0\
+how git works, how to troubleshoot issues, etc.\
+\
+Git cheat sheet \'97\'a0{\field{\*\fldinst{HYPERLINK "https://training.github.com/kit/downloads/github-git-cheat-sheet.pdf"}}{\fldrslt \cf4 \ul \ulc4 https://training.github.com/kit/downloads/github-git-cheat-sheet.pdf}}\
+Most of the commands you would want with short descriptions.\
+\
+Pro Git \'97\'a0{\field{\*\fldinst{HYPERLINK "http://git-scm.com/book"}}{\fldrslt \cf4 \ul \ulc4 http://git-scm.com/book}}\
+It\'92s a book. I wouldn\'92t try to read it in once sitting, though you\'92ll absorb a lot and it is doable.\
+Has pretty much anything you would ever want to know/do with git.\
+\
+\pard\pardeftab720
+
+\b\fs32 \cf2 Using Dartmouth\'92s git server\'a0\'97
+\b0 \
+\pard\pardeftab720
+
+\b\fs30 \cf2 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720
+\ls1\ilvl0
+\b0 \cf2 {\listtext	1.	}cd into the directory of your project\
+{\listtext	2.	}initialize a git repo by running \'93git init\'94\
+{\listtext	3.	}stage files using \'93git add\'94, commit by using \'93git commit\'94\
+{\listtext	4.	}add Dartmouth\'92s git server as your origin, "git remote add origin\'a0{\field{\*\fldinst{HYPERLINK "https://git.cs.dartmouth.edu/cs58-F14-team%5BN%5D.git%E2%80%9D"}}{\fldrslt \cf4 \ul \ulc4 https://git.cs.dartmouth.edu/cs58-F14-team[N].git\'94}}\
+\pard\pardeftab720
+\cf2 Note that [N] is your team number, listed below\
+5. push the\'a0
+\b master\'a0
+\b0 branch\'a0to the\'a0
+\b origin\'a0
+\b0 repository by running \'93git push -u origin master\'94.\
+Note that -u makes it so you push to this branch by default. After you ran this command once you can just\'a0\'93git push\'94.\
+6. login using your\'a0
+\b FULL NAME AS DARTMOUTH KNOWS IT.\'a0
+\b0 For example, I am \'93\cb5 Stefan\cb3  G. Boesen\'94. Use your Dartmouth password to login.\
+Capitalization, punctuation, all matters. If you can\'92t login, make sure it\'92s all correct, then email cs58@cs for help.\
+\
+\pard\pardeftab720
+
+\b \cf2 List of teams and team numbers\'a0\'97
+\b0 \
+\pard\tx220\tx720\pardeftab720\li720\fi-720
+\ls2\ilvl0\cf2 {\listtext	\'95	}\'a0Team Cooperating System:\'a0
+\fs26 cs58-F14-team1
+\fs30 \
+{\listtext	\'95	}\'a0Team TO_NORWICH:\'a0
+\fs26 cs58-F14-team2
+\fs30 \
+{\listtext	\'95	}\'a0Team stderr:\'a0
+\fs26 cs58-F14-team3
+\fs30 \
+{\listtext	\'95	}Team SEGFAULT: c
+\fs26 s58-F14-team4
+\fs30 \
+{\listtext	\'95	}Team NiXers:\'a0
+\fs26 cs58-F14-team5
+\fs30 \
+{\listtext	\'95	}Team Mutex:\'a0
+\fs26 cs58-F14-team6
+\fs30 \
+{\listtext	\'95	}Team GreeNiX:\'a0
+\fs26 cs58-F14-team7
+\fs30 \
+{\listtext	\'95	}Team TO_HANOVER:\'a0
+\fs26 cs58-F14-team8
+\fs30 \
+{\listtext	\'95	}Team ReduX:\'a0
+\fs26 cs58-F14-team9
+\fs30 \
+{\listtext	\'95	}Team syscall:\'a0
+\fs26 cs58-F14-team10
+\fs30 \
+{\listtext	\'95	}Wu Tang Clan:\'a0
+\fs26 cs58-F14-team11
+\fs30 \
+\pard\pardeftab720
+\cf2 Thanks!\
+\pard\pardeftab720
+\cf2 \cb5 Stefan\cb3 \
+}

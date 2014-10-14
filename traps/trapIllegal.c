@@ -7,4 +7,5 @@ Method: abort currently runnng yalnix process,
 
 void trapIllegal(UserContext *) {
 	//kill the current process
+	//TracePrintf(message: process ID and explanation of problem)
 }
