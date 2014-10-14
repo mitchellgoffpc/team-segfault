@@ -15,8 +15,11 @@
 #include "trapTtyTransmit.c"
 
 
+typedef void (*InterruptHandler) (UserContext*);
+
 //the interrupt vector table
-int (*interrupt_vector[TRAP_VECTOR_SIZE]);
+InterruptHandler interrupt_vector[TRAP_VECTOR_SIZE];
+
 int first_free_index = 8;
 
 //function prototypes for traps
@@ -27,15 +30,19 @@ void trapMath(UserContext *);
 void trapMemory(UserContext *);
 void trapTtyReceive(UserContext *);
 void trapTtyTransmit(UserContext *);
+void trapDisk(UserContext *);
 
 //function prototypes for kernelStart
-void initializeInterruptVector();
+void initializeInterruptVector(void);
+void DoIdle(void);
 
 void kernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *uctxt) {
 	
 	//initialize interrupt vector tables 
 	//by making them point to the correct handler functions
 	initializeInterruptVector();
+
+	WriteRegister(REG_VECTOR_BASE, interrupt_vector);
 
 	//initialize the REG_VECTOR_BASE privileged machine register 
 	//to point to interrupt vector table
@@ -48,6 +55,7 @@ void kernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *uctxt) {
 	//enable virtual memory
 
 	//create an idle process that executes the Pause machine instruction 
+	DoIdle();
 
 	//create the first process and load initial program into it
 
@@ -59,17 +67,17 @@ void kernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *uctxt) {
 
 }
 
-void initializeInterruptVector() {
+void initializeInterruptVector(void) {
 
 	//initialize vector entries to point to functions
-	interrupt_vector[0] = trapKernel;
-	interrupt_vector[1] = trapClock;
-	interrupt_vector[2] = trapIllegal;
-	interrupt_vector[3] = trapMemory;
-	interrupt_vector[4] = trapMath;
-	interrupt_vector[5] = trapTtyReceive;
-	interrupt_vector[6] = trapTtyTransmit;
-	interrupt_vector[7] = trapDisk;
+	interrupt_vector[TRAP_KERNEL] = trapKernel;
+	interrupt_vector[TRAP_CLOCK] = trapClock;
+	interrupt_vector[TRAP_ILLEGAL] = trapIllegal;
+	interrupt_vector[TRAP_MEMORY] = trapMemory;
+	interrupt_vector[TRAP_MATH] = trapMath;
+	interrupt_vector[TRAP_TTY_RECEIVE] = trapTtyReceive;
+	interrupt_vector[TRAP_TTY_TRANSMIT] = trapTtyTransmit;
+	interrupt_vector[TRAP_DISK] = trapDisk;
 
 	//initialize the rest of the entries to point to null
 	int i;
@@ -81,3 +89,11 @@ void initializeInterruptVector() {
 	return 0
 
 }
+
+void DoIdle(void) {
+	while(1) {
+		TracePrintf(1, "DoIdle\n");
+		Pause();
+	}
+}
+
