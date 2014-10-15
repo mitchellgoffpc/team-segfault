@@ -55,12 +55,13 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *uctxt) {
 	WriteRegister(REG_VM_ENABLE, 1);
 
 	//create an idle process that executes the Pause machine instruction 
-	DoIdle();
+	//DoIdle();
 
 	//create the first process and load initial program into it by
 	//setting up the stack then the
 	//program counter needs to point to DoIdle
-	
+	PageTable *table = (PageTable*) malloc(sizeof(PageTable));
+
 	uctxt.pc = DoIdle; //address of DoIdle;
 
 
@@ -92,6 +93,7 @@ void initializeInterruptVector(void) {
 	i = first_free_index;
 	while (i < TRAP_VECTOR_SIZE) {
 		interrupt_vector[i] = NULL;
+		i++;
 	}
 
 	return;

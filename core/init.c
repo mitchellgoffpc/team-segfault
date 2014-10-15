@@ -94,6 +94,14 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 
 	// For now, just create an idle process that executes the Pause machine instruction 
 	Pause();
+	PageTable *table = (PageTable*) malloc(sizeof(PageTable));
+
+	for (int i = 0; i < table.entries; i++){
+		address = allocatePageFRame();
+		table->entries[i] = createPTEWithOptions(options, address);
+		//table.entries[i] = createPTEWithOptions(0, 0);
+	}
+	context->pc = DoIdle;
 	// DoIdle();
 }
 
@@ -117,7 +125,7 @@ void initializeInterruptVector(void) {
 	interrupt_vector[TRAP_DISK] = trapDisk;
 
 	// Set the rest of the entries to null
-	for (int i=8; i<TRAP_VECTOR_SIZE; i++) {
+	for (int i=first_free_index; i<TRAP_VECTOR_SIZE; i++) {
 		interrupt_vector[i] = NULL;
 	}
 }
