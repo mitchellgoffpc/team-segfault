@@ -57,7 +57,11 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *uctxt) {
 	//create an idle process that executes the Pause machine instruction 
 	DoIdle();
 
-	//create the first process and load initial program into it
+	//create the first process and load initial program into it by
+	//setting up the stack then the
+	//program counter needs to point to DoIdle
+	uctxt.pc = //address of DoIdle;
+
 
 	//construct contexts of init and idle process
 	//save these contexts so that the contexts can be switched in and out
