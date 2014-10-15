@@ -63,8 +63,9 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *uctxt) {
 	//save these contexts so that the contexts can be switched in and out
 	//write context of init process into currently active context (uctxt)
 
+
 	//return
-	return NULL;
+	return;
 
 }
 
@@ -87,7 +88,7 @@ void initializeInterruptVector(void) {
 		interrupt_vector[i] = NULL;
 	}
 
-	return 0
+	return;
 
 }
 
