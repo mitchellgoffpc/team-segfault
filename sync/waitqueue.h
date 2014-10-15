@@ -16,6 +16,7 @@
  * =============================== */
 
 #include "../process/list.h"
+#include "../process/process.h"
 
 
 
@@ -26,11 +27,9 @@
 
  * =============================== */
 
-struct ProcessDescriptor;
 struct WaitQueueNode;
 struct WaitQueue;
 
-typedef struct ProcessDescriptor ProcessDescriptor;
 typedef struct WaitQueueNode WaitQueueNode;
 typedef struct WaitQueue WaitQueue;
 
@@ -61,15 +60,53 @@ struct WaitQueueNode {
 
 
 /*
-  The WaitQueue struct keeps track of a single waitqueue and allows
-  us to iterate over all the processes, or to dequeue just the next
-  process.
+  The WaitQueue struct keeps track of a single waitqueue and allows us to
+  iterate over all the processes, or to dequeue just the next process.
 */
 
 struct WaitQueue {
-	Spinlock lock;
 	LinkedListNode head;
 };
+
+
+
+
+ /* =============================== *
+
+  		      Macros
+
+ * =============================== */
+
+/*
+  Macros and functions to create an initialize waitqueues
+*/
+
+// Statically initialize a new waitqueue
+#define waitQueue(name) { linkedListNode(name.head) }
+
+// Dynamically initialize a new waitqueue
+#define waitQueueInit(name) \
+  	linkedListNodeInit(&name->node)
+
+// Create a new waitqueue variable
+#define newWaitQueue(name) \
+	WaitQueue name = waitQueue(name)
+
+
+
+// Statically initialize a new waitqueue node
+#define waitQueueNode(name, process) { 1, &wakeUpProcess, process, linkedListNode(name.node) }
+
+// Dynamically initialize a new waitqueue node
+#define waitQueueNodeInit(name, process) \
+	(name)->is_exclusive = 0; \
+	(name)->prepareToWakeUp = &wakeUpProcess; \
+	(name)->process = (process); \
+	linkedListNodeInit(&name->node)
+
+// Create a new waitqueue node variable
+#define newWaitQueueNode(name) \
+	WaitQueueNode name = waitQueueNode(name)
 
 
 
@@ -84,12 +121,13 @@ void aquireSpinlock(Spinlock *lock);
 void releaseSpinlock(Spinlock *lock);
 
 void addToWaitQueue(WaitQueueNode *node, WaitQueue *head);
-void sleepOnWaitQueue(ProcessDescriptor* process, WaitQueue *head);
-void sleepOnWaitQueueWithOptions(ProcessDescriptor* process, WaitQueue *head, int exclusive);
-void signalWaitQueue(WaitQueue *head, int exclusive);
+int sleepOnWaitQueue(ProcessDescriptor* process, WaitQueue *head);
+int sleepOnWaitQueueWithOptions(ProcessDescriptor* process, WaitQueue *head, int exclusive);
+void signalWaitQueue(WaitQueue *head);
+void signalWaitQueueWithOptions(WaitQueue *head, int exclusive);
 
-void prepareToSleep(ProcessDescriptor *process);
-int tryToWakeUp(WaitQueueNode *node);
+void putProcessToSleep(ProcessDescriptor *process);
+int wakeUpProcess(WaitQueueNode *node);
 
 
 

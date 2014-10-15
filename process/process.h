@@ -16,8 +16,8 @@
  * =============================== */
 
 #include <limits.h>
+#include "../memory/memory.h"
 #include "list.h"
-#include "../sync/waitqueue.h"
 
 
 
@@ -28,7 +28,7 @@
 
  * =============================== */
 
-int MAX_PID = INT_MAX;
+// int MAX_PID = INT_MAX;
 
 
 
@@ -41,6 +41,7 @@ int MAX_PID = INT_MAX;
 
 struct ProcessInfo;
 struct ProcessDescriptor;
+struct WaitQueueNode;
 
 typedef struct ProcessInfo ProcessInfo;
 typedef struct ProcessDescriptor ProcessDescriptor;
@@ -129,18 +130,20 @@ struct ProcessInfo {
 struct ProcessDescriptor {
 	PID pid;
 
-	ProcessState state;
+	enum ProcessState state;
 	ProcessInfo* info;
 	
 	ProcessDescriptor* parent;
 	LinkedListNode children;
 	LinkedListNode siblings;
 
-	pid_t group_leader_pid;
-	pid_t thread_leader_pid;
+	PID group_leader_pid;
+	PID thread_leader_pid;
 
 	LinkedListNode process_list;
-	WaitQueueNode *waitqueue;
+	struct WaitQueueNode *waitqueue;
+
+  PageTable *page_table;
 };
 
 

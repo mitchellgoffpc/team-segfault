@@ -1,5 +1,5 @@
 /*
-  File: waitqueue.h
+  File: waitqueue.c
   Date: 10/6/2014
   Author: Mitchell Goff
 */
@@ -13,6 +13,7 @@
  * =============================== */
 
 #include <stdlib.h>
+#include <errno.h>
 
 #include "../process/list.h"
 #include "../process/process.h"
@@ -28,12 +29,10 @@
  * =============================== */
 
 /*
-  Some basic functionality for spinlocks. These are rather inefficient, and
-  should only be used to ensure that the waitqueues are properly synchronized.
-  
-  Note: On Yalnix, putting a spinlock on wait queues is probably superfluous
-  since interrupts are disabled while in kernel mode. However, including them
-  is good practice in case we ever want to port the OS to another system.
+  Some basic functionality for spinlocks.
+
+  Note: On Yalnix, using spinlocks inside the kernel is probably superfluous
+  since interrupts are disabled while in kernel mode.
 */
 
 void aquireSpinlock(Spinlock *lock) {
@@ -50,85 +49,55 @@ void releaseSpinlock(Spinlock *lock) {
 
 
 /*
-  Macros and functions to create an initialize waitqueues
-*/
-
-// Statically initialize a new waitqueue
-#define waitQueue(name) { 0, linkedListNode(name) }
-
-// Dynamically initialize a new waitqueue
-#define waitQueueInit(name) \
-  	(name)->lock = 0; \
-  	linkedListNodeInit(&name->node)
-
-// Create a new waitqueue variable
-#define newWaitQueue(name) \
-	WaitQueue name = waitQueue(name)
-
-
-
-// Statically initialize a new waitqueue node
-#define waitQueueNode(name, process) { 1, &tryToWakeUp, process, linkedListNode(name) }
-
-// Dynamically initialize a new waitqueue node
-#define waitQueueNodeInit(name, process) \
-	(name)->is_exclusive = 0; \
-	(name)->prepareToWakeUp = &tryToWakeUp; \
-	(name)->process = (process); \
-	linkedListNodeInit(&name->node)
-
-// Create a new waitqueue node variable
-#define newWaitQueueNode(name) \
-	WaitQueueNode name = waitQueueNode(name)
-
-
-
-
-/*
   Allow a process to add itself to a waitqueue, then sleep until it is woken up.
-  Note: For a more robust implementation, we would need to add a memory barier
-  before releasing the spinlock. However, this opens a whole can of worms that
-  we don't really need to worry about, so I'm saving that project for another time.
 */
 
 // Add a waitqueue node to a waitqueue
-void addToWaitQueue(WaitQueueNode *node, WaitQueue *head) {
-	aquireSpinlock(&head->lock);
+void addNodeToWaitQueue(WaitQueueNode *node, WaitQueue *head) {
 
 	// If this node is exclusive, add it to the back of the queue. Otherwise,
 	// if it's non-exclusive, add it to the front so it will be woken up first.
 	node->is_exclusive ?
 		addLastNode(&node->node, &head->head) :
 		addFirstNode(&node->node, &head->head);
-
-	releaseSpinlock(&head->lock);
-	putProcessToSleep(node->process);
 }
 
 // Add an exclusive process to a particular waitqueue
-void sleepOnWaitQueue(ProcessDescriptor* process, WaitQueue *head) {
-	sleepOnWaitQueueWithOptions(process, head, 1); // defaults to exclusive
+int sleepOnWaitQueue(ProcessDescriptor* process, WaitQueue *head) {
+	return sleepOnWaitQueueWithOptions(process, head, 1); // defaults to exclusive
 }
 
 // Create a waitqueue node for a process and add that node to a waitqueue
-void sleepOnWaitQueueWithOptions(ProcessDescriptor* process, WaitQueue *head, int exclusive) {
+int sleepOnWaitQueueWithOptions(ProcessDescriptor* process, WaitQueue *head, int exclusive) {
 	WaitQueueNode *node = (WaitQueueNode*) malloc(sizeof(WaitQueueNode));
+	if (!node) return errno;
+
+	// Set up a new waitqueue node	
 	waitQueueNodeInit(node, process);
-	addToWaitQueue(node, head);
+	process->waitqueue = node;
+
+	// Add the node to the waitqueue, then put the process to sleep.
+	addNodeToWaitQueue(node, head);
+	putProcessToSleep(node->process);
+
+	return 0;
 }
 
 
 
 
 /*
-  Go through a waitqueue and wake up any eligable processes.
+  Signal the waitqueue that another process can be woken up.
 
   exclusive: Determines whether all exclusive processes should be woken up
   			 (broadcast-style), or only one (signal-style).
 */
 
-void signalWaitQueue(WaitQueue *head, int exclusive) {
-	aquireSpinlock(&head->lock);
+void signalWaitQueue(WaitQueue *head) {
+	signalWaitQueueWithOptions(head, 1); // defaults to exclusive
+}
+
+void signalWaitQueueWithOptions(WaitQueue *head, int exclusive) {
 	WaitQueueNode *current;
 
 	// If we're doing an exclusive wakeup, start dequeueing nodes until we
@@ -139,23 +108,21 @@ void signalWaitQueue(WaitQueue *head, int exclusive) {
 		if (succeeded && current->is_exclusive && exclusive)
 			break;
 	}
-
-	releaseSpinlock(&head->lock);
 }
-
 
 
 
 
 /*
-  Functions to wake up a process
+  Functions to put to sleep and wake up a process
 */
 
 void putProcessToSleep(ProcessDescriptor *process) {
 	process->state = PROCESS_WAITING;
-	// schedule();
 }
 
-int tryToWakeUp(WaitQueueNode *node) {
-	return 1;
+int wakeUpProcess(WaitQueueNode *node) {
+	node->process->state = PROCESS_RUNNING;
+	free(node);
+	return 0;
 }

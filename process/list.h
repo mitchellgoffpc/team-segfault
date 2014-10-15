@@ -11,7 +11,7 @@
 
 /* =============================== *
 
-  	    Linked List Macros
+  	          Macros
 
  * =============================== */
 
@@ -37,7 +37,7 @@ typedef struct LinkedListNode LinkedListNode;
 // Magic macro to get the structure containing a node
 #define containerOf(ptr, type, member) ({ \
 	const typeof( ((type *)0)->member ) *__mptr = (ptr); \
-	(type *)( (char *)__mptr - offsetof(type, member) );})
+	(type *) ((char *)__mptr - offsetof(type, member) ); })
 
 // Just an alias for containerOf
 #define elementForNode(ptr, type, member) \
