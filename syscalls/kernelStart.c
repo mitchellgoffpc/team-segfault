@@ -36,16 +36,15 @@ void trapDisk(UserContext *);
 void initializeInterruptVector(void);
 void DoIdle(void);
 
-void kernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *uctxt) {
+void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *uctxt) {
 	
 	//initialize interrupt vector tables 
 	//by making them point to the correct handler functions
 	initializeInterruptVector();
 
-	WriteRegister(REG_VECTOR_BASE, interrupt_vector);
-
 	//initialize the REG_VECTOR_BASE privileged machine register 
 	//to point to interrupt vector table
+	WriteRegister(REG_VECTOR_BASE, (unsigned int) interrupt_vector);
 
 	//stuct to keep track of what page frames in physical memory are free
 	//list of free pages should be based on pmem_size
@@ -65,6 +64,7 @@ void kernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *uctxt) {
 	//write context of init process into currently active context (uctxt)
 
 	//return
+	return NULL;
 
 }
 
