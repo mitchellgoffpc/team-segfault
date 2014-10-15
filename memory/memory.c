@@ -15,10 +15,8 @@
 #include <stdlib.h>
 
 #include "../process/process.h"
-#include "../process/list.h"
+#include "../core/list.h"
 #include "memory.h"
-
-#include <stdio.h>
 
 
 
@@ -30,11 +28,8 @@
  * =============================== */
 
 int VIRTUAL_MEMORY_ENABLED = 0;
+void *KERNEL_DATA = 0;
 void *KERNEL_BRK = 0;
-
-long VMEM_BASE = 0;
-long VMEM_0_LIMIT = 0;
-long PMEM_BASE = 0;
 
 LinkedListNode frame_head = linkedListNode(frame_head);
 PageTable kernel_page_table;
@@ -51,7 +46,14 @@ PageTable kernel_page_table;
 
 // Helper function to create a new Page Table Entry
 PTE createPTEWithOptions(long options, long frame_number) {
-	return (PTE) (options | frame_number);
+	PTE entry;
+
+	entry.valid = (options & PTE_VALID);
+	entry.perm = (options & PTE_PERM_MASK) >> 1;
+	entry.misc = (options & PTE_MISC_MASK) >> 4;
+	entry.pfn = frame_number;
+
+	return entry;
 }
 
 
@@ -135,15 +137,15 @@ void freePageFrame(void *frame) {
   virtual memory is enabled.
 */
 
-void createFrameList() {
-	for (long i = indexOfPage(KERNEL_BRK); i < indexOfPage(VMEM_REGION_SIZE); i++) {
+void createFrameList(long pmem_size) {
+	for (long i = indexOfPage(KERNEL_BRK); i < indexOfPage(pmem_size); i++) {
 		LinkedListNode *node = (LinkedListNode *) (PMEM_BASE + (long)pageAtIndex(i));
 
 		node->prev = (i == indexOfPage(KERNEL_BRK) ? &frame_head : (LinkedListNode *) pageAtIndex(i-1));
 		node->next = (i == indexOfPage(VMEM_REGION_SIZE)-1 ? &frame_head : (LinkedListNode *) pageAtIndex(i+1));
 	}
 
-	frame_head.prev = (LinkedListNode *) (VMEM_REGION_SIZE - PAGESIZE);
+	frame_head.prev = (LinkedListNode *) (pmem_size - PAGESIZE);
 	frame_head.next = (LinkedListNode *) KERNEL_BRK;
 }
 
@@ -161,23 +163,23 @@ void createFrameList() {
   virtual memory won't have been initialized yet.
 */
 
-void initKernelPageTable(void *text_limit) {
+void initKernelPageTable() {
 
 	long text_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_EXEC;
 	long data_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
 
 	// First, map the physical pages containing the kernel text and data to the same addresses
 	// in the virtual address space
-	for (long i=0; i<indexOfPage(text_limit); i++) {
+	for (long i=0; i<indexOfPage(KERNEL_DATA); i++) {
 		kernel_page_table.entries[i] = createPTEWithOptions(text_options, i);
 	}
-	for (long i=indexOfPage(text_limit); i<indexOfPage(KERNEL_BRK); i++) {
+	for (long i=indexOfPage(KERNEL_DATA); i<indexOfPage(KERNEL_BRK); i++) {
 		kernel_page_table.entries[i] = createPTEWithOptions(data_options, i);
 	}
 
 	// Leave the rest of the virtual address space unmapped, except for the stack
 	for (long i=indexOfPage(KERNEL_BRK); i<indexOfPage(VMEM_REGION_SIZE); i++) {
-		kernel_page_table.entries[i] = 0;
+		kernel_page_table.entries[i] = createPTEWithOptions(0, 0);
 	}
 	for (long i=indexOfPage(KERNEL_STACK_BASE); i<indexOfPage(KERNEL_STACK_LIMIT); i++) {
 		kernel_page_table.entries[i] = createPTEWithOptions(data_options, i);
@@ -241,12 +243,12 @@ int SetKernelBrk(void *address) {
 			for (int i=0; i<frames_freed; i++) {
 				// Figure out which physical frame to free
 				long pte_index = indexOfPage(UP_TO_PAGE(address)) + i;
-				long frame_index = kernel_page_table.entries[pte_index] & PTE_ADDRESS;
+				long frame_index = kernel_page_table.entries[pte_index].pfn;
 				void *frame = pageAtIndex(frame_index);
 
 				// Free the frame and clear the PTE
 				freePageFrame(frame);
-				kernel_page_table.entries[pte_index] = 0;
+				kernel_page_table.entries[pte_index] = createPTEWithOptions(0, 0);
 			}
 
 			KERNEL_BRK = (void *) UP_TO_PAGE(address);

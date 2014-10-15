@@ -8,6 +8,6 @@ params: the ready queue
 
 */
 
-void trapClock(UserContext *) {
+void trapClock(UserContext *context) {
 	//context switch to next process
 }

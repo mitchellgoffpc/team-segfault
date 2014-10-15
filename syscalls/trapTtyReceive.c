@@ -6,7 +6,7 @@ Method: new line of input is available from the terminal
 params: code field in UserContext
 */
 
-void trapTtyReceive(UserContext *) {
+void trapTtyReceive(UserContext *context) {
 	//get the correct terminal ID from UserContext.code;
 	//use TtyReceive to grab the input in that terminal
 	//buffer the input line for TtyRead call

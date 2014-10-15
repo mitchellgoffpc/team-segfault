@@ -1,0 +1,521 @@
+** Hardware level 10 tracing enabled **
+** Yalnix level 1 tracing enabled **
+Yalnix     Called SetKernelData
+Hardware   extending PMemFile
+Hardware   mmap physical memory 0x2e000 - 0x400000 READ|WRITE
+Hardware   TTYs disabled due to '-n' flag.
+Hardware   HEAP my_malloc(0x160)
+Hardware   HEAP found a block
+Hardware   HEAP my_malloc(0x160)
+Hardware   HEAP found a block
+Hardware   HEAP my_malloc(0x160)
+Hardware   HEAP found a block
+Hardware   HEAP my_malloc(0x160)
+Hardware   HEAP found a block
+Hardware   HEAP my_malloc(0x160)
+Hardware   HEAP found a block
+Hardware   setting primary signal action
+Hardware   NEW VERSION OF DISK CODE!
+Hardware   _InitDisk: num_inodes = 0 (0 blocks), errno = 0
+Hardware   _InitDisk: DiskFileSize 0
+Hardware   yalnixdisk args[1] = 1000
+lize...
+Hardware   SignalHanlder(10 User defined signal 1), depth 1
+Hardware   sp 0x00000000
+Hardware   sp 0x000ffc00
+Hardware   null PTRB0
+Hardware   Preparing to pad: signals_in 1 sig 10 sp 0x000ffc00 pc = 0xf76ff430 
+Hardware   SignalHandler depth 1 sig 10
+Hardware   Entering RealSignalHandler
+Hardware   
+Hardware   >>> sig 10, addr 0xef0, page 0
+Hardware   About to check whether TLB ought to be loaded
+Hardware   unblocking stackable sigs
+Hardware   SignalStackBase 000ffffc, size 1968
+Hardware   
+SignalHandler: sig 10 (User defined signal 1), code 00000000, context 000ffccc, addr 00000ef0
+Hardware   sp 0xffcaa8bc, pc 0xf76ff430, eax 0xfffffffc ebp 0xffcaa904
+Hardware   Disk initialization done
+Hardware   returning from SignalHandler
+Hardware   sp 0xffcaa8bc, pc 0xf76ff430,  eax 0xfffffffc ebp 0xffcaa904
+Hardware   Returning from signal handler depth 1
+Hardware   SignalHanlder(11 Segmentation fault), depth 1
+Hardware   sp 0x000ffc00
+Hardware   sp 0x000ffc00
+Hardware   null PTRB0
+Hardware   Preparing to pad: signals_in 1 sig 11 sp 0x000ffc00 pc = 0xf76be525 
+Hardware   SignalHandler depth 1 sig 11
+Hardware   Entering RealSignalHandler
+Hardware   
+Hardware   >>> sig 11, addr 0x0, page 0
+Hardware   About to check whether TLB ought to be loaded
+Hardware   unblocking stackable sigs
+Hardware   SignalStackBase 000ffffc, size 1968
+Hardware   
+SignalHandler: sig 11 (Boot ROM), code 00000080, context 000ffccc, addr 00000000
+Hardware   sp 0xffcaaad0, pc 0xf76be525, eax 0xabcdefff ebp 0xffcaab78
+Hardware   Starting kernel
+Yalnix     Called KernelStart
+Yalnix     Creating Page Tables
+Yalnix     Enabling virtual memory...
+Yalnix     Page Table Address: 24580
+Yalnix     Kernel Brk: 2E000
+Yalnix     PTE 0: 0
+Yalnix     PTE 1: 1
+Yalnix     PTE 2: 2
+Yalnix     PTE 3: 3
+Yalnix     PTE 4: 4
+Yalnix     PTE 5: 5
+Yalnix     PTE 6: 6
+Yalnix     PTE 7: 7
+Yalnix     PTE 8: 8
+Yalnix     PTE 9: 9
+Yalnix     PTE 10: A
+Yalnix     PTE 11: B
+Yalnix     PTE 12: C
+Yalnix     PTE 13: D
+Yalnix     PTE 14: E
+Yalnix     PTE 15: F
+Yalnix     PTE 16: 10
+Yalnix     PTE 17: 11
+Yalnix     PTE 18: 12
+Yalnix     PTE 19: 13
+Yalnix     PTE 20: 14
+Yalnix     PTE 21: 15
+Yalnix     PTE 22: 16
+Yalnix     PTE 23: 0
+Yalnix     PTE 24: 0
+Yalnix     PTE 25: 0
+Yalnix     PTE 26: 0
+Yalnix     PTE 27: 0
+Yalnix     PTE 28: 0
+Yalnix     PTE 29: 0
+Yalnix     PTE 30: 0
+Yalnix     PTE 31: 0
+Yalnix     PTE 32: 0
+Yalnix     PTE 33: 0
+Yalnix     PTE 34: 0
+Yalnix     PTE 35: 0
+Yalnix     PTE 36: 0
+Yalnix     PTE 37: 0
+Yalnix     PTE 38: 0
+Yalnix     PTE 39: 0
+Yalnix     PTE 40: 0
+Yalnix     PTE 41: 0
+Yalnix     PTE 42: 0
+Yalnix     PTE 43: 0
+Yalnix     PTE 44: 0
+Yalnix     PTE 45: 0
+Yalnix     PTE 46: 0
+Yalnix     PTE 47: 0
+Yalnix     PTE 48: 0
+Yalnix     PTE 49: 0
+Yalnix     PTE 50: 0
+Yalnix     PTE 51: 0
+Yalnix     PTE 52: 0
+Yalnix     PTE 53: 0
+Yalnix     PTE 54: 0
+Yalnix     PTE 55: 0
+Yalnix     PTE 56: 0
+Yalnix     PTE 57: 0
+Yalnix     PTE 58: 0
+Yalnix     PTE 59: 0
+Yalnix     PTE 60: 0
+Yalnix     PTE 61: 0
+Yalnix     PTE 62: 0
+Yalnix     PTE 63: 0
+Yalnix     PTE 64: 0
+Yalnix     PTE 65: 0
+Yalnix     PTE 66: 0
+Yalnix     PTE 67: 0
+Yalnix     PTE 68: 0
+Yalnix     PTE 69: 0
+Yalnix     PTE 70: 0
+Yalnix     PTE 71: 0
+Yalnix     PTE 72: 0
+Yalnix     PTE 73: 0
+Yalnix     PTE 74: 0
+Yalnix     PTE 75: 0
+Yalnix     PTE 76: 0
+Yalnix     PTE 77: 0
+Yalnix     PTE 78: 0
+Yalnix     PTE 79: 0
+Yalnix     PTE 80: 0
+Yalnix     PTE 81: 0
+Yalnix     PTE 82: 0
+Yalnix     PTE 83: 0
+Yalnix     PTE 84: 0
+Yalnix     PTE 85: 0
+Yalnix     PTE 86: 0
+Yalnix     PTE 87: 0
+Yalnix     PTE 88: 0
+Yalnix     PTE 89: 0
+Yalnix     PTE 90: 0
+Yalnix     PTE 91: 0
+Yalnix     PTE 92: 0
+Yalnix     PTE 93: 0
+Yalnix     PTE 94: 0
+Yalnix     PTE 95: 0
+Yalnix     PTE 96: 0
+Yalnix     PTE 97: 0
+Yalnix     PTE 98: 0
+Yalnix     PTE 99: 0
+Yalnix     PTE 100: 0
+Yalnix     PTE 101: 0
+Yalnix     PTE 102: 0
+Yalnix     PTE 103: 0
+Yalnix     PTE 104: 0
+Yalnix     PTE 105: 0
+Yalnix     PTE 106: 0
+Yalnix     PTE 107: 0
+Yalnix     PTE 108: 0
+Yalnix     PTE 109: 0
+Yalnix     PTE 110: 0
+Yalnix     PTE 111: 0
+Yalnix     PTE 112: 0
+Yalnix     PTE 113: 0
+Yalnix     PTE 114: 0
+Yalnix     PTE 115: 0
+Yalnix     PTE 116: 0
+Yalnix     PTE 117: 0
+Yalnix     PTE 118: 0
+Yalnix     PTE 119: 0
+Yalnix     PTE 120: 0
+Yalnix     PTE 121: 0
+Yalnix     PTE 122: 0
+Yalnix     PTE 123: 0
+Yalnix     PTE 124: 0
+Yalnix     PTE 125: 0
+Yalnix     PTE 126: 7E
+Yalnix     PTE 127: 7F
+Hardware   NewPTBR0 0x24580
+Hardware   NewPTLR0 0x80
+Hardware   munmapping for Alex
+Hardware   0x0002e000 >> 13 == 0x00000017
+Hardware   EnableVM: PTBR0 0x00024580, PTLR0 128
+Hardware   EnableVM: PTBR1 0x00000000, PTLR1 0
+Hardware   EnableVM Pmem_Kernel_Pages 23, top addr 0002e000
+Hardware   start = 20910
+Hardware   KernelE 0x00023de0, up 0x00026018, shift 13, gives 0x11
+Hardware   start_page == 16
+Hardware   ValidatePTRegs0 EnableVM: PTBR0 0x00024580 PTLR0 128 text_pages 17
+Hardware   The support's VPNToPTE
+Hardware   EnableVM: page 16 addr 00020000 PTE 0000100b
+Hardware   The support's VPNToPTE
+Hardware   EnableVM: page 17 addr 00022000 PTE 00001107
+Hardware   The support's VPNToPTE
+Hardware   EnableVM: page 18 addr 00024000 PTE 00001207
+Hardware   The support's VPNToPTE
+Hardware   EnableVM: page 19 addr 00026000 PTE 00001307
+Hardware   The support's VPNToPTE
+Hardware   EnableVM: page 20 addr 00028000 PTE 00001407
+Hardware   The support's VPNToPTE
+Hardware   EnableVM: page 21 addr 0002a000 PTE 00001507
+Hardware   The support's VPNToPTE
+Hardware   EnableVM: page 22 addr 0002c000 PTE 00001607
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   FlushTLB (0xffffffff = -1) called
+Hardware   FlushTLB(TLB_FLUSH_ALL)
+Hardware   FlushTLB (0xfffffffd = -3) called
+Hardware   FlushTLB(TLB_FLUSH_1): PTBR1 0x0, PTLR1 0x0
+Hardware   PageInTLB[128] addr 0x100000: 0 -> 0
+Hardware   PageInTLB[129] addr 0x102000: 0 -> 0
+Hardware   PageInTLB[130] addr 0x104000: 0 -> 0
+Hardware   PageInTLB[131] addr 0x106000: 0 -> 0
+Hardware   PageInTLB[132] addr 0x108000: 0 -> 0
+Hardware   PageInTLB[133] addr 0x10a000: 0 -> 0
+Hardware   PageInTLB[134] addr 0x10c000: 0 -> 0
+Hardware   PageInTLB[135] addr 0x10e000: 0 -> 0
+Hardware   PageInTLB[136] addr 0x110000: 0 -> 0
+Hardware   PageInTLB[137] addr 0x112000: 0 -> 0
+Hardware   PageInTLB[138] addr 0x114000: 0 -> 0
+Hardware   PageInTLB[139] addr 0x116000: 0 -> 0
+Hardware   PageInTLB[140] addr 0x118000: 0 -> 0
+Hardware   PageInTLB[141] addr 0x11a000: 0 -> 0
+Hardware   PageInTLB[142] addr 0x11c000: 0 -> 0
+Hardware   PageInTLB[143] addr 0x11e000: 0 -> 0
+Hardware   PageInTLB[144] addr 0x120000: 0 -> 0
+Hardware   PageInTLB[145] addr 0x122000: 0 -> 0
+Hardware   PageInTLB[146] addr 0x124000: 0 -> 0
+Hardware   PageInTLB[147] addr 0x126000: 0 -> 0
+Hardware   PageInTLB[148] addr 0x128000: 0 -> 0
+Hardware   PageInTLB[149] addr 0x12a000: 0 -> 0
+Hardware   PageInTLB[150] addr 0x12c000: 0 -> 0
+Hardware   PageInTLB[151] addr 0x12e000: 0 -> 0
+Hardware   PageInTLB[152] addr 0x130000: 0 -> 0
+Hardware   PageInTLB[153] addr 0x132000: 0 -> 0
+Hardware   PageInTLB[154] addr 0x134000: 0 -> 0
+Hardware   PageInTLB[155] addr 0x136000: 0 -> 0
+Hardware   PageInTLB[156] addr 0x138000: 0 -> 0
+Hardware   PageInTLB[157] addr 0x13a000: 0 -> 0
+Hardware   PageInTLB[158] addr 0x13c000: 0 -> 0
+Hardware   PageInTLB[159] addr 0x13e000: 0 -> 0
+Hardware   PageInTLB[160] addr 0x140000: 0 -> 0
+Hardware   PageInTLB[161] addr 0x142000: 0 -> 0
+Hardware   PageInTLB[162] addr 0x144000: 0 -> 0
+Hardware   PageInTLB[163] addr 0x146000: 0 -> 0
+Hardware   PageInTLB[164] addr 0x148000: 0 -> 0
+Hardware   PageInTLB[165] addr 0x14a000: 0 -> 0
+Hardware   PageInTLB[166] addr 0x14c000: 0 -> 0
+Hardware   PageInTLB[167] addr 0x14e000: 0 -> 0
+Hardware   PageInTLB[168] addr 0x150000: 0 -> 0
+Hardware   PageInTLB[169] addr 0x152000: 0 -> 0
+Hardware   PageInTLB[170] addr 0x154000: 0 -> 0
+Hardware   PageInTLB[171] addr 0x156000: 0 -> 0
+Hardware   PageInTLB[172] addr 0x158000: 0 -> 0
+Hardware   PageInTLB[173] addr 0x15a000: 0 -> 0
+Hardware   PageInTLB[174] addr 0x15c000: 0 -> 0
+Hardware   PageInTLB[175] addr 0x15e000: 0 -> 0
+Hardware   PageInTLB[176] addr 0x160000: 0 -> 0
+Hardware   PageInTLB[177] addr 0x162000: 0 -> 0
+Hardware   PageInTLB[178] addr 0x164000: 0 -> 0
+Hardware   PageInTLB[179] addr 0x166000: 0 -> 0
+Hardware   PageInTLB[180] addr 0x168000: 0 -> 0
+Hardware   PageInTLB[181] addr 0x16a000: 0 -> 0
+Hardware   PageInTLB[182] addr 0x16c000: 0 -> 0
+Hardware   PageInTLB[183] addr 0x16e000: 0 -> 0
+Hardware   PageInTLB[184] addr 0x170000: 0 -> 0
+Hardware   PageInTLB[185] addr 0x172000: 0 -> 0
+Hardware   PageInTLB[186] addr 0x174000: 0 -> 0
+Hardware   PageInTLB[187] addr 0x176000: 0 -> 0
+Hardware   PageInTLB[188] addr 0x178000: 0 -> 0
+Hardware   PageInTLB[189] addr 0x17a000: 0 -> 0
+Hardware   PageInTLB[190] addr 0x17c000: 0 -> 0
+Hardware   PageInTLB[191] addr 0x17e000: 0 -> 0
+Hardware   PageInTLB[192] addr 0x180000: 0 -> 0
+Hardware   PageInTLB[193] addr 0x182000: 0 -> 0
+Hardware   PageInTLB[194] addr 0x184000: 0 -> 0
+Hardware   PageInTLB[195] addr 0x186000: 0 -> 0
+Hardware   PageInTLB[196] addr 0x188000: 0 -> 0
+Hardware   PageInTLB[197] addr 0x18a000: 0 -> 0
+Hardware   PageInTLB[198] addr 0x18c000: 0 -> 0
+Hardware   PageInTLB[199] addr 0x18e000: 0 -> 0
+Hardware   PageInTLB[200] addr 0x190000: 0 -> 0
+Hardware   PageInTLB[201] addr 0x192000: 0 -> 0
+Hardware   PageInTLB[202] addr 0x194000: 0 -> 0
+Hardware   PageInTLB[203] addr 0x196000: 0 -> 0
+Hardware   PageInTLB[204] addr 0x198000: 0 -> 0
+Hardware   PageInTLB[205] addr 0x19a000: 0 -> 0
+Hardware   PageInTLB[206] addr 0x19c000: 0 -> 0
+Hardware   PageInTLB[207] addr 0x19e000: 0 -> 0
+Hardware   PageInTLB[208] addr 0x1a0000: 0 -> 0
+Hardware   PageInTLB[209] addr 0x1a2000: 0 -> 0
+Hardware   PageInTLB[210] addr 0x1a4000: 0 -> 0
+Hardware   PageInTLB[211] addr 0x1a6000: 0 -> 0
+Hardware   PageInTLB[212] addr 0x1a8000: 0 -> 0
+Hardware   PageInTLB[213] addr 0x1aa000: 0 -> 0
+Hardware   PageInTLB[214] addr 0x1ac000: 0 -> 0
+Hardware   PageInTLB[215] addr 0x1ae000: 0 -> 0
+Hardware   PageInTLB[216] addr 0x1b0000: 0 -> 0
+Hardware   PageInTLB[217] addr 0x1b2000: 0 -> 0
+Hardware   PageInTLB[218] addr 0x1b4000: 0 -> 0
+Hardware   PageInTLB[219] addr 0x1b6000: 0 -> 0
+Hardware   PageInTLB[220] addr 0x1b8000: 0 -> 0
+Hardware   PageInTLB[221] addr 0x1ba000: 0 -> 0
+Hardware   PageInTLB[222] addr 0x1bc000: 0 -> 0
+Hardware   PageInTLB[223] addr 0x1be000: 0 -> 0
+Hardware   PageInTLB[224] addr 0x1c0000: 0 -> 0
+Hardware   PageInTLB[225] addr 0x1c2000: 0 -> 0
+Hardware   PageInTLB[226] addr 0x1c4000: 0 -> 0
+Hardware   PageInTLB[227] addr 0x1c6000: 0 -> 0
+Hardware   PageInTLB[228] addr 0x1c8000: 0 -> 0
+Hardware   PageInTLB[229] addr 0x1ca000: 0 -> 0
+Hardware   PageInTLB[230] addr 0x1cc000: 0 -> 0
+Hardware   PageInTLB[231] addr 0x1ce000: 0 -> 0
+Hardware   PageInTLB[232] addr 0x1d0000: 0 -> 0
+Hardware   PageInTLB[233] addr 0x1d2000: 0 -> 0
+Hardware   PageInTLB[234] addr 0x1d4000: 0 -> 0
+Hardware   PageInTLB[235] addr 0x1d6000: 0 -> 0
+Hardware   PageInTLB[236] addr 0x1d8000: 0 -> 0
+Hardware   PageInTLB[237] addr 0x1da000: 0 -> 0
+Hardware   PageInTLB[238] addr 0x1dc000: 0 -> 0
+Hardware   PageInTLB[239] addr 0x1de000: 0 -> 0
+Hardware   PageInTLB[240] addr 0x1e0000: 0 -> 0
+Hardware   PageInTLB[241] addr 0x1e2000: 0 -> 0
+Hardware   PageInTLB[242] addr 0x1e4000: 0 -> 0
+Hardware   PageInTLB[243] addr 0x1e6000: 0 -> 0
+Hardware   PageInTLB[244] addr 0x1e8000: 0 -> 0
+Hardware   PageInTLB[245] addr 0x1ea000: 0 -> 0
+Hardware   PageInTLB[246] addr 0x1ec000: 0 -> 0
+Hardware   PageInTLB[247] addr 0x1ee000: 0 -> 0
+Hardware   PageInTLB[248] addr 0x1f0000: 0 -> 0
+Hardware   PageInTLB[249] addr 0x1f2000: 0 -> 0
+Hardware   PageInTLB[250] addr 0x1f4000: 0 -> 0
+Hardware   PageInTLB[251] addr 0x1f6000: 0 -> 0
+Hardware   PageInTLB[252] addr 0x1f8000: 0 -> 0
+Hardware   PageInTLB[253] addr 0x1fa000: 0 -> 0
+Hardware   PageInTLB[254] addr 0x1fc000: 0 -> 0
+Hardware   PageInTLB[255] addr 0x1fe000: 0 -> 0
+Hardware   TLB_FLUSH_1 munmap 0x100000 0x100000
+Hardware   FlushTLB (0xfffffffe = -2) called
+Hardware   FlushTLB(TLB_FLUSH_0): PTBR0 0x24580, PTLR0 0x80
+Hardware   start = 20910
+Hardware   KernelE 0x00023de0, up 0x000ff7b8, shift 13, gives 0x11
+Hardware   start_page == 16
+Hardware   ValidatePTRegs0 FlushTLB: PTBR0 0x00024580 PTLR0 128 text_pages 17
+Hardware   The support's VPNToPTE
+Hardware   FlushTLB: page 16 addr 00020000 PTE 0000100b
+Hardware   The support's VPNToPTE
+Hardware   FlushTLB: page 17 addr 00022000 PTE 00001107
+Hardware   The support's VPNToPTE
+Hardware   FlushTLB: page 18 addr 00024000 PTE 00001207
+Hardware   The support's VPNToPTE
+Hardware   FlushTLB: page 19 addr 00026000 PTE 00001307
+Hardware   The support's VPNToPTE
+Hardware   FlushTLB: page 20 addr 00028000 PTE 00001407
+Hardware   The support's VPNToPTE
+Hardware   FlushTLB: page 21 addr 0002a000 PTE 00001507
+Hardware   The support's VPNToPTE
+Hardware   FlushTLB: page 22 addr 0002c000 PTE 00001607
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   PageInTLB[23] addr 0x2e000: 0 -> 0
+Hardware   PageInTLB[24] addr 0x30000: 0 -> 0
+Hardware   PageInTLB[25] addr 0x32000: 0 -> 0
+Hardware   PageInTLB[26] addr 0x34000: 0 -> 0
+Hardware   PageInTLB[27] addr 0x36000: 0 -> 0
+Hardware   PageInTLB[28] addr 0x38000: 0 -> 0
+Hardware   PageInTLB[29] addr 0x3a000: 0 -> 0
+Hardware   PageInTLB[30] addr 0x3c000: 0 -> 0
+Hardware   PageInTLB[31] addr 0x3e000: 0 -> 0
+Hardware   PageInTLB[32] addr 0x40000: 0 -> 0
+Hardware   PageInTLB[33] addr 0x42000: 0 -> 0
+Hardware   PageInTLB[34] addr 0x44000: 0 -> 0
+Hardware   PageInTLB[35] addr 0x46000: 0 -> 0
+Hardware   PageInTLB[36] addr 0x48000: 0 -> 0
+Hardware   PageInTLB[37] addr 0x4a000: 0 -> 0
+Hardware   PageInTLB[38] addr 0x4c000: 0 -> 0
+Hardware   PageInTLB[39] addr 0x4e000: 0 -> 0
+Hardware   PageInTLB[40] addr 0x50000: 0 -> 0
+Hardware   PageInTLB[41] addr 0x52000: 0 -> 0
+Hardware   PageInTLB[42] addr 0x54000: 0 -> 0
+Hardware   PageInTLB[43] addr 0x56000: 0 -> 0
+Hardware   PageInTLB[44] addr 0x58000: 0 -> 0
+Hardware   PageInTLB[45] addr 0x5a000: 0 -> 0
+Hardware   PageInTLB[46] addr 0x5c000: 0 -> 0
+Hardware   PageInTLB[47] addr 0x5e000: 0 -> 0
+Hardware   PageInTLB[48] addr 0x60000: 0 -> 0
+Hardware   PageInTLB[49] addr 0x62000: 0 -> 0
+Hardware   PageInTLB[50] addr 0x64000: 0 -> 0
+Hardware   PageInTLB[51] addr 0x66000: 0 -> 0
+Hardware   PageInTLB[52] addr 0x68000: 0 -> 0
+Hardware   PageInTLB[53] addr 0x6a000: 0 -> 0
+Hardware   PageInTLB[54] addr 0x6c000: 0 -> 0
+Hardware   PageInTLB[55] addr 0x6e000: 0 -> 0
+Hardware   PageInTLB[56] addr 0x70000: 0 -> 0
+Hardware   PageInTLB[57] addr 0x72000: 0 -> 0
+Hardware   PageInTLB[58] addr 0x74000: 0 -> 0
+Hardware   PageInTLB[59] addr 0x76000: 0 -> 0
+Hardware   PageInTLB[60] addr 0x78000: 0 -> 0
+Hardware   PageInTLB[61] addr 0x7a000: 0 -> 0
+Hardware   PageInTLB[62] addr 0x7c000: 0 -> 0
+Hardware   PageInTLB[63] addr 0x7e000: 0 -> 0
+Hardware   PageInTLB[64] addr 0x80000: 0 -> 0
+Hardware   PageInTLB[65] addr 0x82000: 0 -> 0
+Hardware   PageInTLB[66] addr 0x84000: 0 -> 0
+Hardware   PageInTLB[67] addr 0x86000: 0 -> 0
+Hardware   PageInTLB[68] addr 0x88000: 0 -> 0
+Hardware   PageInTLB[69] addr 0x8a000: 0 -> 0
+Hardware   PageInTLB[70] addr 0x8c000: 0 -> 0
+Hardware   PageInTLB[71] addr 0x8e000: 0 -> 0
+Hardware   PageInTLB[72] addr 0x90000: 0 -> 0
+Hardware   PageInTLB[73] addr 0x92000: 0 -> 0
+Hardware   PageInTLB[74] addr 0x94000: 0 -> 0
+Hardware   PageInTLB[75] addr 0x96000: 0 -> 0
+Hardware   PageInTLB[76] addr 0x98000: 0 -> 0
+Hardware   PageInTLB[77] addr 0x9a000: 0 -> 0
+Hardware   PageInTLB[78] addr 0x9c000: 0 -> 0
+Hardware   PageInTLB[79] addr 0x9e000: 0 -> 0
+Hardware   PageInTLB[80] addr 0xa0000: 0 -> 0
+Hardware   PageInTLB[81] addr 0xa2000: 0 -> 0
+Hardware   PageInTLB[82] addr 0xa4000: 0 -> 0
+Hardware   PageInTLB[83] addr 0xa6000: 0 -> 0
+Hardware   PageInTLB[84] addr 0xa8000: 0 -> 0
+Hardware   PageInTLB[85] addr 0xaa000: 0 -> 0
+Hardware   PageInTLB[86] addr 0xac000: 0 -> 0
+Hardware   PageInTLB[87] addr 0xae000: 0 -> 0
+Hardware   PageInTLB[88] addr 0xb0000: 0 -> 0
+Hardware   PageInTLB[89] addr 0xb2000: 0 -> 0
+Hardware   PageInTLB[90] addr 0xb4000: 0 -> 0
+Hardware   PageInTLB[91] addr 0xb6000: 0 -> 0
+Hardware   PageInTLB[92] addr 0xb8000: 0 -> 0
+Hardware   PageInTLB[93] addr 0xba000: 0 -> 0
+Hardware   PageInTLB[94] addr 0xbc000: 0 -> 0
+Hardware   PageInTLB[95] addr 0xbe000: 0 -> 0
+Hardware   PageInTLB[96] addr 0xc0000: 0 -> 0
+Hardware   PageInTLB[97] addr 0xc2000: 0 -> 0
+Hardware   PageInTLB[98] addr 0xc4000: 0 -> 0
+Hardware   PageInTLB[99] addr 0xc6000: 0 -> 0
+Hardware   PageInTLB[100] addr 0xc8000: 0 -> 0
+Hardware   PageInTLB[101] addr 0xca000: 0 -> 0
+Hardware   PageInTLB[102] addr 0xcc000: 0 -> 0
+Hardware   PageInTLB[103] addr 0xce000: 0 -> 0
+Hardware   PageInTLB[104] addr 0xd0000: 0 -> 0
+Hardware   PageInTLB[105] addr 0xd2000: 0 -> 0
+Hardware   PageInTLB[106] addr 0xd4000: 0 -> 0
+Hardware   PageInTLB[107] addr 0xd6000: 0 -> 0
+Hardware   PageInTLB[108] addr 0xd8000: 0 -> 0
+Hardware   PageInTLB[109] addr 0xda000: 0 -> 0
+Hardware   PageInTLB[110] addr 0xdc000: 0 -> 0
+Hardware   PageInTLB[111] addr 0xde000: 0 -> 0
+Hardware   PageInTLB[112] addr 0xe0000: 0 -> 0
+Hardware   PageInTLB[113] addr 0xe2000: 0 -> 0
+Hardware   PageInTLB[114] addr 0xe4000: 0 -> 0
+Hardware   PageInTLB[115] addr 0xe6000: 0 -> 0
+Hardware   PageInTLB[116] addr 0xe8000: 0 -> 0
+Hardware   PageInTLB[117] addr 0xea000: 0 -> 0
+Hardware   PageInTLB[118] addr 0xec000: 0 -> 0
+Hardware   PageInTLB[119] addr 0xee000: 0 -> 0
+Hardware   PageInTLB[120] addr 0xf0000: 0 -> 0
+Hardware   PageInTLB[121] addr 0xf2000: 0 -> 0
+Hardware   PageInTLB[122] addr 0xf4000: 0 -> 0
+Hardware   PageInTLB[123] addr 0xf6000: 0 -> 0
+Hardware   PageInTLB[124] addr 0xf8000: 0 -> 0
+Hardware   PageInTLB[125] addr 0xfa000: 0 -> 0
+Hardware   TLB_FLUSH_0 below stack munmap 0x2e000 0xce000
+Hardware   TLB_FLUSH_0 above stack munmap 0x100000 0x0
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   The support's VPNToPTE
+Hardware   		Pause() called!
+Hardware   SignalHanlder(14 Alarm clock), depth 2
+Hardware   sp 0x000ffc00
+Hardware   sp 0x000ff5c0
+Hardware   current kernel stack frames 126 127
+Hardware   Preparing to pad: signals_in 2 sig 14 sp 0x000ff5c0 pc = 0xf76ff430 
+Hardware   SignalHandler depth 2 sig 14
+Hardware   Entering RealSignalHandler
+Hardware   
+Hardware   >>> sig 14, addr 0x0, page 0
+Hardware   About to check whether TLB ought to be loaded
+Hardware   unblocking stackable sigs
+Hardware   SignalStackBase 000ffffc, size 2784
+Hardware   
+SignalHandler: sig 14 (Alarm clock), code 00000080, context 000ff68c, addr 00000000
+Hardware   sp 0x000ff710, pc 0xf76ff430, eax 0xfffffffc ebp 0x000ff7e8
+Hardware   Generating Kernel exception sig 14 addr 0x00000000

@@ -7,8 +7,8 @@ params: kernal call number (in teh code field of UserContext)
 returns: (in the regs[0] of UserContext)
 */
 
-void trapKernel(UserContext * ){
-	int call_number = UserContext.regs[0];
+void trapKernel(UserContext *context){
+	int call_number = context->regs[0];
 
 	//load the requested kernel call
 	//execute the requested kernel call
