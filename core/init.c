@@ -119,11 +119,11 @@ int initIdle() {
 	kernel_page_table.entries[i] = createPTEWithOptions(text_options, offset);
 	
 	for (long i=indexOfPage(KERNEL_BRK); i<indexOfPage(VMEM_REGION_SIZE); i++) {
-		table.entries[i] = createPTEWithOptions(0, 0);
+		table->entries[i] = createPTEWithOptions(0, 0);
 	}
 
 	for (long i=indexOfPage(KERNEL_STACK_BASE); i<indexOfPage(KERNEL_STACK_LIMIT); i++) {
-		table.entries[i] = createPTEWithOptions(data_options, i);
+		table->entries[i] = createPTEWithOptions(data_options, i);
 	}
 }
 
