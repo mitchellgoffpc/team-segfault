@@ -94,19 +94,38 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 
 	// For now, just create an idle process that executes the Pause machine instruction 
 	Pause();
-	PageTable *table = (PageTable*) malloc(sizeof(PageTable));
+	
 
-	for (int i = 0; i < table.entries; i++){
-		address = allocatePageFRame();
-		table->entries[i] = createPTEWithOptions(options, address);
-		//table.entries[i] = createPTEWithOptions(0, 0);
-	}
-	context->pc = DoIdle;
-	// DoIdle();
+	initIdle();
+	
+
+	//need to load DoIdle into UserText
+
+	context.pc = VMEM_1_BASE + (DoIdle & PAGEOFFSET);
+
 }
 
 
+int initIdle() {
+	PageTable *table = (PageTable*) malloc(sizeof(PageTable));
 
+	long text_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_EXEC;
+	long data_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
+
+	PTE entry = kernel_page_table.entries[(long)DoIdle >> PAGESHIFT];
+	PTE new_entry = createPTEWithOptions(text_options, (long)entry.pfn);
+	long offset = DoIdle & PAGESHIFT;
+
+	kernel_page_table.entries[i] = createPTEWithOptions(text_options, offset);
+	
+	for (long i=indexOfPage(KERNEL_BRK); i<indexOfPage(VMEM_REGION_SIZE); i++) {
+		table.entries[i] = createPTEWithOptions(0, 0);
+	}
+
+	for (long i=indexOfPage(KERNEL_STACK_BASE); i<indexOfPage(KERNEL_STACK_LIMIT); i++) {
+		table.entries[i] = createPTEWithOptions(data_options, i);
+	}
+}
 
 /*
   Initialize the interrupt vector
