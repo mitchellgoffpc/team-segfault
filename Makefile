@@ -22,11 +22,11 @@ ALL = $(KERNEL_ALL) $(USER_APPS)
 KERNEL_ALL = yalnix
 
 #List all kernel source files here.  
-KERNEL_SRCS = core/init.c memory/memory.c traps/traps.c
+KERNEL_SRCS = init/init.c init/init_memory.c memory/memory.c traps/traps.c process/process.c process/load.c
 #List the objects to be formed form the kernel source files here.  Should be the same as the previous list, replacing ".c" with ".o"
-KERNEL_OBJS = core/init.o memory/memory.o traps/traps.c
+KERNEL_OBJS = init/init.o init/init_memory.o memory/memory.o traps/traps.o process/process.o process/load.o
 #List all of the header files necessary for your kernel
-KERNEL_INCS = memory/memory.h process/process.h core/list.h traps/traps.h
+KERNEL_INCS = core/list.h memory/memory.h traps/traps.h process/process.h
 
 
 #List all user programs here.

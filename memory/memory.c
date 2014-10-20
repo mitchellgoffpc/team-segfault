@@ -12,9 +12,8 @@
 
  * =============================== */
 
-#include <stdlib.h>
+#include <string.h>
 
-#include "../process/process.h"
 #include "../core/list.h"
 #include "memory.h"
 
@@ -27,9 +26,9 @@
 
  * =============================== */
 
-int VIRTUAL_MEMORY_ENABLED = 0;
-void *KERNEL_DATA = 0;
 void *KERNEL_BRK = 0;
+long PMEM_SIZE = 0;
+char *frc_table = NULL;
 
 LinkedListNode frame_head = linkedListNode(frame_head);
 PageTable kernel_page_table;
@@ -40,7 +39,7 @@ PageTable kernel_page_table;
 
 /* =============================== *
 
-  	       Implementation
+  	      Helper Functions
 
  * =============================== */
 
@@ -58,6 +57,20 @@ PTE createPTEWithOptions(long options, long frame_number) {
 
 
 
+// Helper function to mark every entry in this table as invalid
+void clearPageTable(PageTable *table) {
+	memset(table, 0x00, indexOfPage(VMEM_REGION_SIZE) * sizeof(PTE));
+}
+
+
+
+
+
+/* =============================== *
+
+  	    Page Frame Allocation
+
+ * =============================== */
 
 /*
   Allocate a new page frame and returns its physical address.
@@ -67,13 +80,21 @@ PTE createPTEWithOptions(long options, long frame_number) {
 */
 
 void* allocatePageFrame() {
-	if (frame_head.next == &frame_head) return 0;
+
+	TracePrintf(2, "Allocating a page frame...\n");
+
+	// Check if there are any page frames left.
+	if (frame_head.next == &frame_head) {
+		TracePrintf(1, "We're out of page frames!\n");
+		return 0;
+	}
 
 	long options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
-	void *page_offset = (void *)frame_head.next;
+	void *frame = (void *)frame_head.next;
 
 	// Move the first frame window to the frame that frame_head.next points to
 	frame_window_pte(0) = createPTEWithOptions(options, indexOfPage(frame_head.next));
+	frc_table[ indexOfPage(frame_head.next) ] = 1;
 
 	// If this is the last free page, set frame_head to an empty list
 	if (((LinkedListNode *) frame_window(0))->next == &frame_head) {
@@ -90,7 +111,9 @@ void* allocatePageFrame() {
 		((LinkedListNode *) frame_window(1))->prev = &frame_head;
 	}
 
-	return page_offset;
+	TracePrintf(2, "Allocated a page frame at %lX\n", (long)frame);
+
+	return frame;
 }
 
 
@@ -101,6 +124,10 @@ void* allocatePageFrame() {
 */
 
 void freePageFrame(void *frame) {
+
+	frc_table[ indexOfPage(frame) ] -= 1;
+	if (frc_table[ indexOfPage(frame) ] > 0) return;
+
 	long options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
 
 	// Move the first frame window to the frame that frame_head.next points to
@@ -126,134 +153,114 @@ void freePageFrame(void *frame) {
 		((LinkedListNode *) frame_window(0))->next = next_page;
 		((LinkedListNode *) frame_window(1))->prev = (LinkedListNode *) frame;
 	}
+
+	TracePrintf(2, "Freed a page frame at %lX\n", (long)frame);
 }
 
 
 
 
+
+/* =============================== *
+
+  	   Kernel Heap Allocation
+
+ * =============================== */
+
 /*
-  Create a linked list of available page frames, where each node is stored at the
-  bottom of a page frame in physical memory. This function can only be run before
-  virtual memory is enabled.
+  If we're increasing the size of the heap, allocate some new page frames
+  and set the page table entries for the heap to point to them
 */
 
-void createFrameList(long pmem_size) {
-	for (long i = indexOfPage(KERNEL_BRK); i < indexOfPage(pmem_size); i++) {
-		LinkedListNode *node = (LinkedListNode *) (PMEM_BASE + (long)pageAtIndex(i));
+int increaseKernelBrk(void *address) {
 
-		node->prev = (i == indexOfPage(KERNEL_BRK) ? &frame_head : (LinkedListNode *) pageAtIndex(i-1));
-		node->next = (i == indexOfPage(VMEM_REGION_SIZE)-1 ? &frame_head : (LinkedListNode *) pageAtIndex(i+1));
+	// Figure out how many new frames we need to allocate
+	long frames_needed = (UP_TO_PAGE(address) - (long)KERNEL_BRK) >> PAGESHIFT;
+
+	for (int i=0; i<frames_needed; i++) {
+		// Allocate a new physical page frame, then create a PTE for it
+		void *frame = allocatePageFrame();
+		if (frame == NULL) {
+			TracePrintf(1, "There aren't any page frames left for the heap :(\n");
+			return -1;
+		}
+
+		long options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
+		PTE entry = createPTEWithOptions(options, indexOfPage(frame));
+
+		// Insert the new PTE into the page table
+		long index = indexOfPage(KERNEL_BRK) + i;
+		kernel_page_table.entries[index] = entry;
 	}
 
-	frame_head.prev = (LinkedListNode *) (pmem_size - PAGESIZE);
-	frame_head.next = (LinkedListNode *) KERNEL_BRK;
+	KERNEL_BRK = (void *) UP_TO_PAGE(address);
+	return 0;
 }
 
 
 
 
 /*
-  Initialize the page table for REGION 0. This will set up the virtual address space
-  in REGION 0 as follows:
-
-  Kernel TEXT and DATA:  low memory
-  Kernel HEAP and STACK: high memory
-
-  Note: $data_start and $heap_start should contain physical addresses, since
-  virtual memory won't have been initialized yet.
+  If we're shrinking the heap, free any page frames we no longer need
+  and mark the corresponding page table entries as invalid
 */
 
-void initKernelPageTable() {
+int decreaseKernelBrk(void *address) {
 
-	long text_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_EXEC;
-	long data_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
+	// Figure out how many frames we need to free
+	long frames_freed = ((long)KERNEL_BRK - UP_TO_PAGE(address)) >> PAGESHIFT;
 
-	// First, map the physical pages containing the kernel text and data to the same addresses
-	// in the virtual address space
-	for (long i=0; i<indexOfPage(KERNEL_DATA); i++) {
-		kernel_page_table.entries[i] = createPTEWithOptions(text_options, i);
-	}
-	for (long i=indexOfPage(KERNEL_DATA); i<indexOfPage(KERNEL_BRK); i++) {
-		kernel_page_table.entries[i] = createPTEWithOptions(data_options, i);
+	for (int i=0; i<frames_freed; i++) {
+		// Figure out which physical frame to free
+		long pte_index = indexOfPage(UP_TO_PAGE(address)) + i;
+		long frame_index = kernel_page_table.entries[pte_index].pfn;
+		void *frame = pageAtIndex(frame_index);
+
+		// Free the frame and clear the PTE
+		freePageFrame(frame);
+		kernel_page_table.entries[pte_index] = createPTEWithOptions(0, 0);
 	}
 
-	// Leave the rest of the virtual address space unmapped, except for the stack
-	for (long i=indexOfPage(KERNEL_BRK); i<indexOfPage(VMEM_REGION_SIZE); i++) {
-		kernel_page_table.entries[i] = createPTEWithOptions(0, 0);
-	}
-	for (long i=indexOfPage(KERNEL_STACK_BASE); i<indexOfPage(KERNEL_STACK_LIMIT); i++) {
-		kernel_page_table.entries[i] = createPTEWithOptions(data_options, i);
-	}
+	KERNEL_BRK = (void *) UP_TO_PAGE(address);
+	return 0;
 }
 
 
 
 
 /*
-  Set the Kernel Brk
+  Hook for malloc() and free() to increase or decrease the size of the kernel heap
 */
 
 int SetKernelBrk(void *address) {
 
 	// Before virtual memory is enabled, we just keep track of the highest
  	// address the user has allocated thus far.
-	if (VIRTUAL_MEMORY_ENABLED == 0) {
+	if (!VIRTUAL_MEMORY_ENABLED) {
 		KERNEL_BRK = (address > KERNEL_BRK ? address : KERNEL_BRK);
 	}
 
-	// After virtual memory is enabled, we need to ...
+	// After virtual memory is enabled...
 	else {
 		
 		// First, check if the user is trying to expand the heap into the stack area
-		if (UP_TO_PAGE(address) >= KERNEL_STACK_BASE - VMEM_BASE) return -1;
+		if (UP_TO_PAGE(address) >= KERNEL_STACK_BASE - VMEM_BASE - (NUMBER_OF_FRAME_WINDOWS << PAGESHIFT)) {
+			TracePrintf(1, "Hey! You're trying to expand the kernel heap into the stack!\n");
+			return -1;
+		}
 
 		// Also, check whether we actually need to increase/decrease KERNEL_BRK
 		if (UP_TO_PAGE(address) == (long)KERNEL_BRK) return 0;
 
+		// If everything checks out, try to expand or shrink the heap
+		int status = (UP_TO_PAGE(address) > (long)KERNEL_BRK ?
+			increaseKernelBrk(address) :
+			decreaseKernelBrk(address) );
 
-		// If we're increasing the size of the heap, allocate some new page frames
-		// and set the page table entries for the heap to point to them
-		if (UP_TO_PAGE(address) > (long)KERNEL_BRK) {
-
-			// Figure out how many new frames we need to allocate
-			long frames_needed = (UP_TO_PAGE(address) - (long)KERNEL_BRK) >> PAGESHIFT;
-
-			for (int i=0; i<frames_needed; i++) {
-				// Allocate a new physical page frame, then create a PTE for it
-				void *frame = allocatePageFrame();
-				long options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
-				PTE entry = createPTEWithOptions(options, indexOfPage(frame));
-
-				// Insert the new PTE into the page table
-				long index = indexOfPage(KERNEL_BRK) + i;
-				kernel_page_table.entries[index] = entry;
-			}
-
-			KERNEL_BRK = (void *) UP_TO_PAGE(address);
-		}
-
-
-		// If we're shrinking the heap, free any page frames we no longer need
-		// and mark the corresponding page table entries as invalid
-		else {
-
-			// Figure out how many frames we need to free
-			long frames_freed = ((long)KERNEL_BRK - UP_TO_PAGE(address)) >> PAGESHIFT;
-
-			for (int i=0; i<frames_freed; i++) {
-				// Figure out which physical frame to free
-				long pte_index = indexOfPage(UP_TO_PAGE(address)) + i;
-				long frame_index = kernel_page_table.entries[pte_index].pfn;
-				void *frame = pageAtIndex(frame_index);
-
-				// Free the frame and clear the PTE
-				freePageFrame(frame);
-				kernel_page_table.entries[pte_index] = createPTEWithOptions(0, 0);
-			}
-
-			KERNEL_BRK = (void *) UP_TO_PAGE(address);
-		}
+		if (status == -1) return -1;
 	}
 
+
+	TracePrintf(2, "Changed KERNEL_BRK to %lX\n", (long)KERNEL_BRK);
 	return 0;
 }

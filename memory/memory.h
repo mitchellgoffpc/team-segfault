@@ -17,8 +17,11 @@
 
  * =============================== */
 
-#include "../include/hardware.h"
 #include <stdint.h>
+
+#include "../include/hardware.h"
+#include "../core/list.h"
+
 
 
 
@@ -29,16 +32,16 @@
 
  * =============================== */
 
-#define PTE_VALID 		0x01
-#define PTE_ACCESS		0x10
-#define PTE_MODIFIED    0x20
-#define PTE_CP_ON_WRITE	0x40
-#define PTE_MISC_MASK   0xF0
+#define PTE_VALID 		    0x01
+#define PTE_ACCESS		    0x10
+#define PTE_MODIFIED        0x20
+#define PTE_COPY_ON_WRITE	0x40
+#define PTE_MISC_MASK       0xF0
 
-#define PTE_PERM_READ	0x02
-#define PTE_PERM_WRITE  0x04
-#define PTE_PERM_EXEC	0x08
-#define PTE_PERM_MASK   0x0E
+#define PTE_PERM_READ       0x02
+#define PTE_PERM_WRITE      0x04
+#define PTE_PERM_EXEC       0x08
+#define PTE_PERM_MASK       0x0E
 
 
 struct PageTable;
@@ -47,8 +50,11 @@ struct PTE;
 extern int VIRTUAL_MEMORY_ENABLED;
 extern void *KERNEL_DATA;
 extern void *KERNEL_BRK;
+extern long PMEM_SIZE;
 
+extern LinkedListNode frame_head;
 extern struct PageTable kernel_page_table;
+extern char *frc_table;
 
 typedef struct PTE PTE;
 typedef struct PageTable PageTable;
@@ -101,7 +107,7 @@ struct PageTable {
 #define get_frame_window_pte(i) (&(kernel_page_table.entries[frame_window_pte_base + (long)(i)]))
 
 #define frame_window_pte(i) \
-	WriteRegister(REG_TLB_FLUSH, (long)frame_window(i)); \
+    if (VIRTUAL_MEMORY_ENABLED) { WriteRegister(REG_TLB_FLUSH, (long)frame_window(i)); } \
 	kernel_page_table.entries[frame_window_pte_base + (long)(i)]
 
 // Get the address of the frame window with a particular index
@@ -122,16 +128,19 @@ struct PageTable {
 
  * =============================== */
 
+void initFrameList();
+void initKernelPageTable();
+void initFRCTable();
+
 
 PTE createPTEWithOptions(long options, long frame_number);
+void clearPageTable(PageTable *table);
 
 void* allocatePageFrame();
 void freePageFrame(void *frame);
 
-void createFrameList(long pmem_size);
-void initKernelPageTable();
-
 int SetKernelBrk(void *address);
+
 
 
 #endif
