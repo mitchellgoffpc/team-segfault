@@ -93,7 +93,6 @@ int loadProgram(char *name, char *args[]) {
 
 
     // Open the executable file and do some error checking
-
     if ((fd = open(name, O_RDONLY)) < 0) {
         TracePrintf(0, "LoadProgram: can't open file '%s'\n", name);
         return ERROR;
@@ -113,14 +112,12 @@ int loadProgram(char *name, char *args[]) {
 
 
 
-
     // Figure out in what REGION_1 pages the different program sections
     // start and end
 
     long text_pg1 = (li.t_vaddr - VMEM_1_BASE) >> PAGESHIFT;
     long data_pg1 = (li.id_vaddr - VMEM_1_BASE) >> PAGESHIFT;
     long data_npg = li.id_npg + li.ud_npg;
-
 
     
 
@@ -137,7 +134,6 @@ int loadProgram(char *name, char *args[]) {
 
     TracePrintf(2, "LoadProgram: argsize %d, argcount %d\n", size, argcount);
     
-
 
     
     // The arguments will get copied starting at "cp", and the argv
@@ -181,6 +177,8 @@ int loadProgram(char *name, char *args[]) {
 
 
     
+
+
     // This completes all the checks before we proceed to actually load
     // the new program. From this point on, we are committed to either
     // loading succesfully or killing the process. 
@@ -201,86 +199,45 @@ int loadProgram(char *name, char *args[]) {
     }
 
 
-
     
-    // Set up the page tables for the process so that we can read the
-    // program into memory. Get the right number of physical pages
-    // allocated, and set them all to writable.
+    // Now set up the page table for the process so that we can read the
+    // program into memory. Start by freeing any page frames we're currently
+    // using and clearing the page table.
+    int text_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_EXEC;
+    int data_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
+    freeAddressSpace();
+
+    ((ProcessInfo *) KERNEL_STACK_BASE)->data_start = pageAtIndex(data_pg1);
+    ((ProcessInfo *) KERNEL_STACK_BASE)->heap_start = pageAtIndex(data_pg1 + data_npg);
+    ((ProcessInfo *) KERNEL_STACK_BASE)->current_brk = pageAtIndex(data_pg1 + data_npg);
 
 
-    // First, allocate some memory in the kernel space for the REGION_1
-    // page table and mark all entries as invalid
-    PageTable *table = (PageTable *) malloc(sizeof(PageTable));
-    killIfNull(table);
-    clearPageTable(table);
-    process->page_table = table;
 
-
-
-    // Allocate "li.t_npg" physical pages and map them starting at
-    // the "text_pg1" page in region 1 address space.    
-
+    // Now allocate some physical pages and map them to the right places
+    // in text, data and stack segments, marking everything as writable
     for (i=0; i<li.t_npg; i++) {
-        
-        // Allocate a physical frame. If there aren't any available,
-        // kill the process
-        void *frame = allocatePageFrame();
-        killIfNull(frame);
-
-        // Now create a PTE mapping this frame to the appropriate page in
-        // virtual memory
-        int options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
-        PTE entry = createPTEWithOptions(options, indexOfPage(frame));
+        void *frame = allocatePageFrame(); killIfNull(frame);
+        PTE entry = createPTEWithOptions(data_options, indexOfPage(frame));
         process->page_table->entries[text_pg1 + i] = entry;
-
     }
-
-
-
-    // Allocate "data_npg" physical pages and map them starting at
-    // the "data_pg1" in region 1 address space.    
-
+  
     for (i=0; i<data_npg; i++) {
-        
-        // Allocate a physical frame. If there aren't any available,
-        // kill the process
-        void *frame = allocatePageFrame();
-        killIfNull(frame);
-
-        // Now create a PTE mapping this frame to the appropriate page in
-        // virtual memory
-        int options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
-        PTE entry = createPTEWithOptions(options, indexOfPage(frame));
+        void *frame = allocatePageFrame(); killIfNull(frame);
+        PTE entry = createPTEWithOptions(data_options, indexOfPage(frame));
         process->page_table->entries[data_pg1 + i] = entry;
-
     }
-
-
-
-    // Allocate "stack_npg" physical pages and map them to the top
-    // of the region 1 virtual address space.
 
     for (i=0; i<stack_npg; i++) {
-        
-        // Allocate a physical frame. If there aren't any available,
-        // kill the process
-        void *frame = allocatePageFrame();
-        killIfNull(frame);
-
-        // Now create a PTE mapping this frame to the appropriate page in
-        // virtual memory
-        int options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
-        PTE entry = createPTEWithOptions(options, indexOfPage(frame));
+        void *frame = allocatePageFrame(); killIfNull(frame);
+        PTE entry = createPTEWithOptions(data_options, indexOfPage(frame));
         process->page_table->entries[stack_pg1 + i] = entry;
-
     }
 
-
-    /*
-     * All pages for the new address space are now in the page table.    
-     * But they are not yet in the TLB, remember!
-     */
+    // Flush the TLB for region 1 so we can write to these pages
     WriteRegister(REG_TLB_FLUSH, TLB_FLUSH_1);
+
+
+
 
     // Read the text from the file into memory.
     lseek(fd, li.t_faddr, SEEK_SET);
@@ -291,9 +248,8 @@ int loadProgram(char *name, char *args[]) {
         return KILL;
     }
 
-    /*
-     * Read the data from the file into memory.
-     */
+
+    // Read the text from the file into memory.
     lseek(fd, li.id_faddr, 0);
     segment_size = li.id_npg << PAGESHIFT;
 
@@ -303,10 +259,20 @@ int loadProgram(char *name, char *args[]) {
     }
 
 
-    /*
-     * Now set the page table entries for the program text to be readable
-     * and executable, but not writable.
-     */
+
+    // Now set the page table entries for the program text to be readable
+    // and executable, but not writable.
+    for (i=0; i<li.t_npg; i++) {
+        PTE old_entry = process->page_table->entries[text_pg1 + i];
+        PTE new_entry = createPTEWithOptions(text_options, (long)pageAtIndex(old_entry.pfn));
+        process->page_table->entries[text_pg1 + i] = new_entry;
+    }
+
+    // Flush the TLB for region 1 now that we've updated the PTEs for the text
+    WriteRegister(REG_TLB_FLUSH, TLB_FLUSH_1);
+
+
+
 
 // ==>> Change the protection on the "li.t_npg" pages starting at
 // ==>> virtual address VMEM_1_BASE + (text_pg1 << PAGESHIFT).    Note

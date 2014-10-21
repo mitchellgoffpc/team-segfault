@@ -69,6 +69,11 @@ long max_pid = 0;
         }
     }
 
+    // Create the ProcessInfo struct at the bottom of the stack
+    long options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
+    frame_window_pte(0) = createPTEWithOptions(options, indexOfPage(process->pcb_frames[0]));
+    ((ProcessInfo *) frame_window(0))->descriptor = process;
+
     TracePrintf(2, "Successfully created process descriptor!\n");
     return process;
 }
