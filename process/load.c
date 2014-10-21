@@ -91,19 +91,21 @@ int loadProgram(char *name, char *args[]) {
     char *argbuf;
     ProcessDescriptor *process = getCurrentProcess();
 
+    TracePrintf(0, "Loading program '%s'\n", name);
+
 
     // Open the executable file and do some error checking
     if ((fd = open(name, O_RDONLY)) < 0) {
         TracePrintf(0, "LoadProgram: can't open file '%s'\n", name);
         return ERROR;
     }
-
+    
     if (LoadInfo(fd, &li) != LI_NO_ERROR) {
         TracePrintf(0, "LoadProgram: '%s' not in Yalnix format\n", name);
         close(fd);
         return (-1);
     }
-
+    
     if (li.entry < VMEM_1_BASE) {
         TracePrintf(0, "LoadProgram: '%s' not linked for Yalnix\n", name);
         close(fd);
@@ -124,7 +126,6 @@ int loadProgram(char *name, char *args[]) {
     // Figure out how many bytes are needed to hold the arguments on
     // the new stack that we are building. Also count the number of
     // arguments, to become the argc that the new "main" gets called with.
-    
     long i, size = 0;
     for (i=0; args[i] != NULL; i++) {
         TracePrintf(3, "counting arg %d = '%s'\n", i, args[i]);
@@ -162,7 +163,7 @@ int loadProgram(char *name, char *args[]) {
 
     // Compute how many pages we need for the stack
     long stack_npg = (VMEM_1_LIMIT - DOWN_TO_PAGE(cp2)) >> PAGESHIFT;
-    long stack_pg1 = indexOfPage(VMEM_1_LIMIT) - stack_npg;
+    long stack_pg1 = indexOfPage(VMEM_REGION_SIZE) - stack_npg;
     
     TracePrintf(1, "LoadProgram: heap_size %d, stack_size %d\n",
 	            li.t_npg + data_npg, stack_npg);
@@ -184,6 +185,7 @@ int loadProgram(char *name, char *args[]) {
     // loading succesfully or killing the process. 
 
     // Set the new stack pointer value in the process's exception frame.
+    TracePrintf(1, "Looking good! Now it's time to load the program into memory\n");
     process->context->sp = cp2;
 
     
@@ -220,17 +222,19 @@ int loadProgram(char *name, char *args[]) {
         PTE entry = createPTEWithOptions(data_options, indexOfPage(frame));
         process->page_table->entries[text_pg1 + i] = entry;
     }
-  
     for (i=0; i<data_npg; i++) {
         void *frame = allocatePageFrame(); killIfNull(frame);
         PTE entry = createPTEWithOptions(data_options, indexOfPage(frame));
         process->page_table->entries[data_pg1 + i] = entry;
     }
-
     for (i=0; i<stack_npg; i++) {
         void *frame = allocatePageFrame(); killIfNull(frame);
         PTE entry = createPTEWithOptions(data_options, indexOfPage(frame));
         process->page_table->entries[stack_pg1 + i] = entry;
+    }
+    
+    for (int i=0; i<VMEM_REGION_SIZE >> PAGESHIFT; i++) {
+        TracePrintf(3, "PTE %d: %lX\n", i, (long)process->page_table->entries[i].pfn);
     }
 
     // Flush the TLB for region 1 so we can write to these pages
@@ -248,7 +252,6 @@ int loadProgram(char *name, char *args[]) {
         return KILL;
     }
 
-
     // Read the text from the file into memory.
     lseek(fd, li.id_faddr, 0);
     segment_size = li.id_npg << PAGESHIFT;
@@ -258,48 +261,28 @@ int loadProgram(char *name, char *args[]) {
         return KILL;
     }
 
-
-
     // Now set the page table entries for the program text to be readable
     // and executable, but not writable.
     for (i=0; i<li.t_npg; i++) {
         PTE old_entry = process->page_table->entries[text_pg1 + i];
-        PTE new_entry = createPTEWithOptions(text_options, (long)pageAtIndex(old_entry.pfn));
+        PTE new_entry = createPTEWithOptions(text_options, old_entry.pfn);
         process->page_table->entries[text_pg1 + i] = new_entry;
     }
 
     // Flush the TLB for region 1 now that we've updated the PTEs for the text
     WriteRegister(REG_TLB_FLUSH, TLB_FLUSH_1);
 
+    // Zero out the uninitialized data area
+    memset((void *) li.id_end, 0x00, li.ud_end - li.id_end);
 
-
-
-// ==>> Change the protection on the "li.t_npg" pages starting at
-// ==>> virtual address VMEM_1_BASE + (text_pg1 << PAGESHIFT).    Note
-// ==>> that these pages will have indices starting at text_pg1 in 
-// ==>> the page table for region 1.
-// ==>> The new protection should be (PROT_READ | PROT_EXEC).
-// ==>> If any of these page table entries is also in the TLB, either
-// ==>> invalidate their entries in the TLB or write the updated entries
-// ==>> into the TLB.    It's nice for the TLB and the page tables to remain
-// ==>> consistent.
-
-    close(fd);			/* we've read it all now */
-
-    /*
-     * Zero out the uninitialized data area
-     */
-    memset(&(li.id_end), 0x00, li.ud_end - li.id_end);
-
-    /*
-     * Set the entry point in the exception frame.
-     */
-// ==>> Here you should put your data structure (PCB or process)
-// ==>>    proc->context.pc = (caddr_t) li.entry;
+    // The file has been read into memory, so we can close it
+    close(fd);
 
 
 
 
+    // Set the entry point in the user context
+    process->context->pc = (caddr_t) li.entry;
     
     // Now, finally, build the argument list on the new stack.
     #ifdef LINUX

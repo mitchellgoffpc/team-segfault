@@ -89,10 +89,10 @@ enum ProcessState {
 
 
 /*
-  The ProcessInfo struct contains some low-level information about a
-  process. Currently just a placeholder that lets us get back to the
-  ProcessDescriptor from the stack pointer. Also includes a pointer 
-  to heap and a pointer to data area, as well as the current brk
+  The ProcessInfo struct contains some low-level information about a process and
+  lets us get back to the ProcessDescriptor using just the stack pointer. Also
+  includes a pointer to the bottom of the heap and data areas, as well as the
+  current brk.
 */
 
 struct ProcessInfo {

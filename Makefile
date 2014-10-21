@@ -24,21 +24,17 @@ KERNEL_ALL = yalnix
 #List all kernel source files here.  
 KERNEL_SRCS = init/init.c init/init_memory.c memory/memory.c traps/traps.c process/process.c process/load.c
 #List the objects to be formed form the kernel source files here.  Should be the same as the previous list, replacing ".c" with ".o"
-<<<<<<< Updated upstream
 KERNEL_OBJS = init/init.o init/init_memory.o memory/memory.o traps/traps.o process/process.o process/load.o
-=======
-KERNEL_OBJS = core/init.o memory/memory.o traps/traps.o
->>>>>>> Stashed changes
 #List all of the header files necessary for your kernel
 KERNEL_INCS = core/list.h memory/memory.h traps/traps.h process/process.h
 
 
 #List all user programs here.
-USER_APPS = 
+USER_APPS = apps/init
 #List all user program source files here.  Should be the same as the previous list, with ".c" added to each file
-USER_SRCS = 
+USER_SRCS = apps/init.c
 #List the objects to be formed form the user  source files here.  Should be the same as the previous list, replacing ".c" with ".o"
-USER_OBJS = 
+USER_OBJS = apps/init.o
 #List all of the header files necessary for your user programs
 USER_INCS = 
 

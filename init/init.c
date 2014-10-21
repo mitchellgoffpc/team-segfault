@@ -81,37 +81,45 @@ void initializeInterruptVector() {
   Load the init process into memory and start running it
 */
 
-void loadInit() {
-	TracePrintf(1, "Loading the init process...\n");
+void loadInit(UserContext *context) {
+	TracePrintf(1, "Getting read to load 'init'...\n");
 
+	// Try to allocate space for the REGION_1 page table
 	PageTable *table = (PageTable *) malloc(sizeof(PageTable));
 	if (!table) {
     	TracePrintf(1, "Couldn't find enough space for a new process descriptor!\n");
     	Halt();
     }
-	clearPageTable(table);
 
+	// Try to allocate space for the process descriptor
 	ProcessDescriptor *process = (ProcessDescriptor *) malloc(sizeof(ProcessDescriptor));
     if (!process) {
     	TracePrintf(1, "Couldn't find enough space for a new process descriptor!\n");
     	Halt();
     }
 
+    clearPageTable(table);
     processDescriptorInit(process);
-    if (process->pid == 0) {
-    	TracePrintf(1, "No available PIDs!\n");
-    	Halt();
-    }
 
+
+    // Keep a record of which page frames the new kernel stack was allocated in
     for (int i=0; i<indexOfPage(KERNEL_STACK_MAXSIZE); i++) {
     	process->pcb_frames[i] = (void *) (KERNEL_STACK_BASE + (long)pageAtIndex(i));
     }
 
+    // Update the process descriptor and tell the machine where the REGION_1
+    // page table is located
     process->page_table = table;
+    process->context = context;
+    ((ProcessInfo *) KERNEL_STACK_BASE)->descriptor = process;
+
     WriteRegister(REG_PTBR1, (long)table);
 	WriteRegister(REG_PTLR1, VMEM_REGION_SIZE >> PAGESHIFT);
 
-	DoIdle();
+
+	// DoIdle();
+	char *args = NULL;
+	loadProgram("apps/init", &args);
 }
 
 
@@ -143,23 +151,13 @@ void SetKernelData(void *kernel_data_start, void *kernel_data_end) {
 */
 
 void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context) {
-<<<<<<< Updated upstream:init/init.c
 	TracePrintf(1, "Called KernelStart\n");
-=======
-
-	//TracePrintf(1, "Called KernelStart\n");
->>>>>>> Stashed changes:core/init.c
 	
 	// Build the interrupt vector and set the REG_VECTOR_BASE register to point to it
 	WriteRegister(REG_VECTOR_BASE, (long)interrupt_vector);
 	initializeInterruptVector();
 
 
-<<<<<<< Updated upstream:init/init.c
-=======
-	//TracePrintf(1, "Creating Page Tables\n");
-
->>>>>>> Stashed changes:core/init.c
 	// Initialize the page table
 	TracePrintf(2, "Creating Page Tables\n");
 	PMEM_SIZE = pmem_size;
@@ -168,7 +166,6 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 	initFrameList();
 	initKernelPageTable();
 
-<<<<<<< Updated upstream:init/init.c
 
 	// Enable virtual memory
 	TracePrintf(1, "Enabling virtual memory...\n");
@@ -178,17 +175,7 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 		TracePrintf(3, "PTE %d: %lX\n", i, (long)kernel_page_table.entries[i].pfn);
 	}
 
-=======
-/*
-	TracePrintf(1, "Enabling virtual memory...\n");
-	TracePrintf(1, "Page Table Address: %lX\n", (long)&kernel_page_table);
-	TracePrintf(1, "Kernel Brk: %lX\n", KERNEL_BRK);
-	for (int i=0; i < VMEM_REGION_SIZE >> PAGESHIFT; i++) {
-		TracePrintf(1, "PTE %d: %lX\n", i, (long)kernel_page_table.entries[i].pfn);
-	}
-*/
-	// Enable virtual memory
->>>>>>> Stashed changes:core/init.c
+
 	WriteRegister(REG_PTBR0, (long)&kernel_page_table);
 	WriteRegister(REG_PTLR0, VMEM_REGION_SIZE >> PAGESHIFT);
 
@@ -196,5 +183,5 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 	VIRTUAL_MEMORY_ENABLED = 1;
 
 	// Start the init process
-	loadInit();
+	loadInit(context);
 }
