@@ -1,8 +1,13 @@
-//GetPid
 /*
+	File: kernelGetPid
+	Date: 10/20/2014
+	Author: Emily Holt and Mitchell Goff
+/*
+
 Method: return process ID
 */
+
 void kernelGetPid(UserContext *) {
-	//look into the process struct 
-	//regs[0] = ID of calling process
+	UserContext.regs[0] = ((ProcessInfo *) KERNEL_STACK_BASE)->current_brk;
+
 }

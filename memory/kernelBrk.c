@@ -13,7 +13,7 @@
 #include <string.h>
 
 #include "../core/list.h"
-#include "memory.h"
+#include "memory.c"
 
 
 
@@ -24,7 +24,7 @@
 
  * =============================== */
 
-	PageTable page_table;
+	PageTable user_page_table;
 
 /* =============================== *
 
@@ -56,7 +56,7 @@ int increaseBrk(void *address) {
 
 		// Insert the new PTE into the page table
 		long index = indexOfPage(((ProcessInfo *) KERNEL_STACK_BASE)->current_brk) + i;
-		page_table.entries[index] = entry;
+		user_page_table.entries[index] = entry;
 	}
 
 	((ProcessInfo *) KERNEL_STACK_BASE)->current_brk = (void *) UP_TO_PAGE(address);
@@ -85,7 +85,7 @@ int decreaseBrk(void *address) {
 
 		// Free the frame and clear the PTE
 		freePageFrame(frame);
-		page_table.entries[pte_index] = createPTEWithOptions(0, 0);
+		user_page_table.entries[pte_index] = createPTEWithOptions(0, 0);
 	}
 
 	((ProcessInfo *) KERNEL_STACK_BASE)->current_brk = (void *) UP_TO_PAGE(address);
