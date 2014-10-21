@@ -143,13 +143,23 @@ void SetKernelData(void *kernel_data_start, void *kernel_data_end) {
 */
 
 void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context) {
+<<<<<<< Updated upstream:init/init.c
 	TracePrintf(1, "Called KernelStart\n");
+=======
+
+	//TracePrintf(1, "Called KernelStart\n");
+>>>>>>> Stashed changes:core/init.c
 	
 	// Build the interrupt vector and set the REG_VECTOR_BASE register to point to it
 	WriteRegister(REG_VECTOR_BASE, (long)interrupt_vector);
 	initializeInterruptVector();
 
 
+<<<<<<< Updated upstream:init/init.c
+=======
+	//TracePrintf(1, "Creating Page Tables\n");
+
+>>>>>>> Stashed changes:core/init.c
 	// Initialize the page table
 	TracePrintf(2, "Creating Page Tables\n");
 	PMEM_SIZE = pmem_size;
@@ -158,6 +168,7 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 	initFrameList();
 	initKernelPageTable();
 
+<<<<<<< Updated upstream:init/init.c
 
 	// Enable virtual memory
 	TracePrintf(1, "Enabling virtual memory...\n");
@@ -167,6 +178,17 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 		TracePrintf(3, "PTE %d: %lX\n", i, (long)kernel_page_table.entries[i].pfn);
 	}
 
+=======
+/*
+	TracePrintf(1, "Enabling virtual memory...\n");
+	TracePrintf(1, "Page Table Address: %lX\n", (long)&kernel_page_table);
+	TracePrintf(1, "Kernel Brk: %lX\n", KERNEL_BRK);
+	for (int i=0; i < VMEM_REGION_SIZE >> PAGESHIFT; i++) {
+		TracePrintf(1, "PTE %d: %lX\n", i, (long)kernel_page_table.entries[i].pfn);
+	}
+*/
+	// Enable virtual memory
+>>>>>>> Stashed changes:core/init.c
 	WriteRegister(REG_PTBR0, (long)&kernel_page_table);
 	WriteRegister(REG_PTLR0, VMEM_REGION_SIZE >> PAGESHIFT);
 

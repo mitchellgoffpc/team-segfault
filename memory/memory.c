@@ -229,7 +229,16 @@ int decreaseKernelBrk(void *address) {
 
 
 /*
+<<<<<<< Updated upstream
   Hook for malloc() and free() to increase or decrease the size of the kernel heap
+=======
+  Set the Kernel Brk
+  Method: indicates the lowest address location not used
+		(not yet needed by malloc)
+
+	params: addr (pointer to the address which will be the
+		new lowest location not used by kernel)
+>>>>>>> Stashed changes
 */
 
 int SetKernelBrk(void *address) {

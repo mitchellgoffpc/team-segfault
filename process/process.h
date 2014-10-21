@@ -91,11 +91,15 @@ enum ProcessState {
 /*
   The ProcessInfo struct contains some low-level information about a
   process. Currently just a placeholder that lets us get back to the
-  ProcessDescriptor from the stack pointer.
+  ProcessDescriptor from the stack pointer. Also includes a pointer 
+  to heap and a pointer to data area, as well as the current brk
 */
 
 struct ProcessInfo {
     ProcessDescriptor* descriptor;
+    void *data_start;
+    void *heap_start;
+    void *current_brk;
 };
 
 
