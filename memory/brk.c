@@ -1,12 +1,12 @@
 /*
-	File: kernelBrk.c
+	File: brk.c
 	Date: 10/20/14
 	Author: Emily Holt and Mitchell Goff
 */
 
 /* =============================== *
 
-  	         Includes
+  	        Includes
 
  * =============================== */
 
@@ -18,17 +18,22 @@
 
 
 
+
 /* =============================== *
 
-  	           Data
+  	          Data
 
  * =============================== */
 
-	PageTable user_page_table;
+PageTable user_page_table;
+
+
+
+
 
 /* =============================== *
 
-  	   Kernel Heap Allocation
+  	     Implementation
 
  * =============================== */
 
@@ -37,7 +42,7 @@
   and set the page table entries for the heap to point to them
 */
 
-int increaseBrk(void *address) {
+static int increaseBrk(void *address) {
 
 	// Figure out how many new frames we need to allocate
 	long frames_needed = (UP_TO_PAGE(address) - 
@@ -71,7 +76,7 @@ int increaseBrk(void *address) {
   and mark the corresponding page table entries as invalid
 */
 
-int decreaseBrk(void *address) {
+static int decreaseBrk(void *address) {
 
 	// Figure out how many frames we need to free
 	long frames_freed = (((ProcessInfo *) KERNEL_STACK_BASE)->current_brk - 
@@ -92,18 +97,22 @@ int decreaseBrk(void *address) {
 	return 0;
 }
 
+
+
+
 /* 
-Method: sets the lowest location not used by the program
+  Method: sets the lowest location not used by the program
 */
 
-void kernelBrk(UserContext *) {
-	void *address = UserContext.regs[0];
+void kernelBrk(UserContext *context) {
+	void *address = context->regs[0];
+	
 	//need some variable to keep track of lowest location not used by program
 	//modify addr to be rounded up to the next multiple of PAGESIZE bytes
 	//set that variable to be equal to addr
 	//return ERROR if one occurs
 	
-	if (UP_TO_PAGE(address) >= Usercontext.sp) {
+	if (UP_TO_PAGE(address) >= DOWN_TO_PAGE(context->sp)) {
 		TracePrintf(1, "Hey! You're trying to expand the heap into the stack!\n");
 		return -1;
 	}

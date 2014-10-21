@@ -172,7 +172,7 @@ void freePageFrame(void *frame) {
   and set the page table entries for the heap to point to them
 */
 
-int increaseKernelBrk(void *address) {
+static int increaseKernelBrk(void *address) {
 
 	// Figure out how many new frames we need to allocate
 	long frames_needed = (UP_TO_PAGE(address) - (long)KERNEL_BRK) >> PAGESHIFT;
@@ -205,7 +205,7 @@ int increaseKernelBrk(void *address) {
   and mark the corresponding page table entries as invalid
 */
 
-int decreaseKernelBrk(void *address) {
+static int decreaseKernelBrk(void *address) {
 
 	// Figure out how many frames we need to free
 	long frames_freed = ((long)KERNEL_BRK - UP_TO_PAGE(address)) >> PAGESHIFT;
@@ -229,16 +229,7 @@ int decreaseKernelBrk(void *address) {
 
 
 /*
-<<<<<<< Updated upstream
   Hook for malloc() and free() to increase or decrease the size of the kernel heap
-=======
-  Set the Kernel Brk
-  Method: indicates the lowest address location not used
-		(not yet needed by malloc)
-
-	params: addr (pointer to the address which will be the
-		new lowest location not used by kernel)
->>>>>>> Stashed changes
 */
 
 int SetKernelBrk(void *address) {

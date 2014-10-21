@@ -133,6 +133,9 @@ void initKernelPageTable();
 void initFRCTable();
 
 
+void kernelBrk(UserContext *context);
+
+
 PTE createPTEWithOptions(long options, long frame_number);
 void clearPageTable(PageTable *table);
 
