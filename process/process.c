@@ -152,5 +152,4 @@ int delayProcess(int ticks) {
     schedule();
 
     return SUCCESS;
->>>>>>> FETCH_HEAD
 }

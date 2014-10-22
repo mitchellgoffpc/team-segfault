@@ -107,10 +107,6 @@ static int decreaseBrk(void *address) {
 void kernelBrk(UserContext *context) {
 	void *address = context->regs[0];
 	
-	//need some variable to keep track of lowest location not used by program
-	//modify addr to be rounded up to the next multiple of PAGESIZE bytes
-	//set that variable to be equal to addr
-	//return ERROR if one occurs
 	
 	if (UP_TO_PAGE(address) >= DOWN_TO_PAGE(context->sp)) {
 		TracePrintf(1, "Hey! You're trying to expand the heap into the stack!\n");
