@@ -17,13 +17,21 @@
 
 #include "../include/hardware.h"
 
+
+
+
+
 /* =============================== *
 
-  	          Globals
+  	           Data
 
  * =============================== */
 
-long ellapsed_clock_ticks;
+extern long elapsed_clock_ticks;
+
+
+
+
 
 /* =============================== *
 

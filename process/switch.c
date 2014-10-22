@@ -16,6 +16,7 @@
 
 #include "../include/hardware.h"
 #include "../memory/memory.h"
+#include "../traps/traps.h"
 #include "process.h"
 
 
@@ -102,6 +103,8 @@ void schedule() {
 
 		new_process = elementForNode(node, ProcessDescriptor, process_list);
 		if (new_process->state != PROCESS_RUNNING) continue;
+		if (new_process->wake_up_time > elapsed_clock_ticks) continue;
+		
 		break;
 	}
 

@@ -17,6 +17,7 @@
 
 #include "../include/hardware.h"
 #include "../memory/memory.h"
+#include "../traps/traps.h"
 #include "../core/list.h"
 #include "process.h"
 
@@ -146,12 +147,9 @@ int delayProcess(int ticks) {
         return ERROR;
     }
 
-    // Block the calling process until clock_ticks clock interrupts have occurred
-    int counter = 0;
-    while (counter < ticks) {
-        //put the idle process on the ready queue
-        //call a trapClock to kill the switch to
-        //the next process on the ready queue
-        //which will be doIdle
-    }
+    // Block the calling process until so many clock interrupts have occurred
+    getCurrentProcess()->wake_up_time = elapsed_clock_ticks + ticks;
+    schedule();
+
+    return SUCCESS;
 }

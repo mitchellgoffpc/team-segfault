@@ -8,7 +8,7 @@ Yalnix     Initializing FRC table
 Yalnix     Initializing frame list
 Yalnix     Initializing kernel page table
 Yalnix     Enabling virtual memory...
-Yalnix     Page Table Address: 27000
+Yalnix     Page Table Address: 27060
 Yalnix     Kernel Brk: 30000
 Yalnix     PTE 0: 0
 Yalnix     PTE 1: 1
@@ -292,103 +292,181 @@ Yalnix     Successfully created process descriptor!
 Yalnix     Allocating a page frame...
 Yalnix     Allocated a page frame at 3E000
 Yalnix     Finished forking!
-Yalnix     Getting read to fork...
-Yalnix     Creating a new process descriptor...
+User Prog  Running Idle... PID = 1
+Yalnix     TRAP_CLOCK
+Yalnix     Finished forking!
+Yalnix     Loading program 'apps/test'
+Yalnix     LoadProgram: argsize 0, argcount 0
+Yalnix     prog_size 4, text 2 data 1 bss 1 pages
+Yalnix     LoadProgram: heap_size 4, stack_size 1
+Yalnix     Looking good! Now it's time to load the program into memory
+Yalnix     Freed a page frame at 3E000
+Yalnix     Allocating a page frame...
+Yalnix     Allocated a page frame at 3E000
 Yalnix     Allocating a page frame...
 Yalnix     Allocated a page frame at 40000
 Yalnix     Allocating a page frame...
 Yalnix     Allocated a page frame at 42000
-Yalnix     Successfully created process descriptor!
 Yalnix     Allocating a page frame...
 Yalnix     Allocated a page frame at 44000
-Yalnix     Finished forking!
-User Prog  Running Idle... PID = 1
-User Prog  test = 32
-Yalnix     TRAP_CLOCK
-Yalnix     Finished forking!
 Yalnix     Allocating a page frame...
 Yalnix     Allocated a page frame at 46000
-Yalnix     Getting read to fork...
-Yalnix     Creating a new process descriptor...
-Yalnix     Allocating a page frame...
-Yalnix     Allocated a page frame at 48000
-Yalnix     Allocating a page frame...
-Yalnix     Allocated a page frame at 4A000
-Yalnix     Successfully created process descriptor!
-Yalnix     Allocating a page frame...
-Yalnix     Allocated a page frame at 4C000
-Yalnix     Finished forking!
-User Prog  Running Idle... PID = 2
-User Prog  test = 48
-Yalnix     TRAP_CLOCK
-Yalnix     Finished forking!
-Yalnix     Allocating a page frame...
-Yalnix     Allocated a page frame at 4E000
-User Prog  Running Idle... PID = 3
-User Prog  test = 64
-Yalnix     TRAP_CLOCK
-Yalnix     Finished forking!
-Yalnix     Allocating a page frame...
-Yalnix     Allocated a page frame at 50000
-User Prog  Running Idle... PID = 4
-User Prog  test = 64
+Yalnix     PTE 0: 1F
+Yalnix     PTE 1: 20
+Yalnix     PTE 2: 21
+Yalnix     PTE 3: 22
+Yalnix     PTE 4: 0
+Yalnix     PTE 5: 0
+Yalnix     PTE 6: 0
+Yalnix     PTE 7: 0
+Yalnix     PTE 8: 0
+Yalnix     PTE 9: 0
+Yalnix     PTE 10: 0
+Yalnix     PTE 11: 0
+Yalnix     PTE 12: 0
+Yalnix     PTE 13: 0
+Yalnix     PTE 14: 0
+Yalnix     PTE 15: 0
+Yalnix     PTE 16: 0
+Yalnix     PTE 17: 0
+Yalnix     PTE 18: 0
+Yalnix     PTE 19: 0
+Yalnix     PTE 20: 0
+Yalnix     PTE 21: 0
+Yalnix     PTE 22: 0
+Yalnix     PTE 23: 0
+Yalnix     PTE 24: 0
+Yalnix     PTE 25: 0
+Yalnix     PTE 26: 0
+Yalnix     PTE 27: 0
+Yalnix     PTE 28: 0
+Yalnix     PTE 29: 0
+Yalnix     PTE 30: 0
+Yalnix     PTE 31: 0
+Yalnix     PTE 32: 0
+Yalnix     PTE 33: 0
+Yalnix     PTE 34: 0
+Yalnix     PTE 35: 0
+Yalnix     PTE 36: 0
+Yalnix     PTE 37: 0
+Yalnix     PTE 38: 0
+Yalnix     PTE 39: 0
+Yalnix     PTE 40: 0
+Yalnix     PTE 41: 0
+Yalnix     PTE 42: 0
+Yalnix     PTE 43: 0
+Yalnix     PTE 44: 0
+Yalnix     PTE 45: 0
+Yalnix     PTE 46: 0
+Yalnix     PTE 47: 0
+Yalnix     PTE 48: 0
+Yalnix     PTE 49: 0
+Yalnix     PTE 50: 0
+Yalnix     PTE 51: 0
+Yalnix     PTE 52: 0
+Yalnix     PTE 53: 0
+Yalnix     PTE 54: 0
+Yalnix     PTE 55: 0
+Yalnix     PTE 56: 0
+Yalnix     PTE 57: 0
+Yalnix     PTE 58: 0
+Yalnix     PTE 59: 0
+Yalnix     PTE 60: 0
+Yalnix     PTE 61: 0
+Yalnix     PTE 62: 0
+Yalnix     PTE 63: 0
+Yalnix     PTE 64: 0
+Yalnix     PTE 65: 0
+Yalnix     PTE 66: 0
+Yalnix     PTE 67: 0
+Yalnix     PTE 68: 0
+Yalnix     PTE 69: 0
+Yalnix     PTE 70: 0
+Yalnix     PTE 71: 0
+Yalnix     PTE 72: 0
+Yalnix     PTE 73: 0
+Yalnix     PTE 74: 0
+Yalnix     PTE 75: 0
+Yalnix     PTE 76: 0
+Yalnix     PTE 77: 0
+Yalnix     PTE 78: 0
+Yalnix     PTE 79: 0
+Yalnix     PTE 80: 0
+Yalnix     PTE 81: 0
+Yalnix     PTE 82: 0
+Yalnix     PTE 83: 0
+Yalnix     PTE 84: 0
+Yalnix     PTE 85: 0
+Yalnix     PTE 86: 0
+Yalnix     PTE 87: 0
+Yalnix     PTE 88: 0
+Yalnix     PTE 89: 0
+Yalnix     PTE 90: 0
+Yalnix     PTE 91: 0
+Yalnix     PTE 92: 0
+Yalnix     PTE 93: 0
+Yalnix     PTE 94: 0
+Yalnix     PTE 95: 0
+Yalnix     PTE 96: 0
+Yalnix     PTE 97: 0
+Yalnix     PTE 98: 0
+Yalnix     PTE 99: 0
+Yalnix     PTE 100: 0
+Yalnix     PTE 101: 0
+Yalnix     PTE 102: 0
+Yalnix     PTE 103: 0
+Yalnix     PTE 104: 0
+Yalnix     PTE 105: 0
+Yalnix     PTE 106: 0
+Yalnix     PTE 107: 0
+Yalnix     PTE 108: 0
+Yalnix     PTE 109: 0
+Yalnix     PTE 110: 0
+Yalnix     PTE 111: 0
+Yalnix     PTE 112: 0
+Yalnix     PTE 113: 0
+Yalnix     PTE 114: 0
+Yalnix     PTE 115: 0
+Yalnix     PTE 116: 0
+Yalnix     PTE 117: 0
+Yalnix     PTE 118: 0
+Yalnix     PTE 119: 0
+Yalnix     PTE 120: 0
+Yalnix     PTE 121: 0
+Yalnix     PTE 122: 0
+Yalnix     PTE 123: 0
+Yalnix     PTE 124: 0
+Yalnix     PTE 125: 0
+Yalnix     PTE 126: 0
+Yalnix     PTE 127: 23
+User Prog  Running Idle... PID = 1
 Yalnix     TRAP_CLOCK
 User Prog  Running Idle... PID = 1
-User Prog  test = 32
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 2
-User Prog  test = 48
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 3
-User Prog  test = 64
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 4
-User Prog  test = 64
 Yalnix     TRAP_CLOCK
 User Prog  Running Idle... PID = 1
-User Prog  test = 32
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 2
-User Prog  test = 48
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 3
-User Prog  test = 64
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 4
-User Prog  test = 64
 Yalnix     TRAP_CLOCK
 User Prog  Running Idle... PID = 1
-User Prog  test = 32
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 2
-User Prog  test = 48
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 3
-User Prog  test = 64
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 4
-User Prog  test = 64
 Yalnix     TRAP_CLOCK
 User Prog  Running Idle... PID = 1
-User Prog  test = 32
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 2
-User Prog  test = 48
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 3
-User Prog  test = 64
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 4
-User Prog  test = 64
 Yalnix     TRAP_CLOCK
 User Prog  Running Idle... PID = 1
-User Prog  test = 32
 Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 2
-User Prog  test = 48
+User Prog  Running Idle... PID = 1
 Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 3
-User Prog  test = 64
+User Prog  Running Idle... PID = 1
 Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 4
-User Prog  test = 64
+User Prog  Running Idle... PID = 1
+Yalnix     TRAP_CLOCK
+User Prog  Running Idle... PID = 1
+Yalnix     TRAP_CLOCK
+User Prog  Running Test... PID = 2
+Yalnix     TRAP_CLOCK
+User Prog  Running Idle... PID = 1
+Yalnix     TRAP_CLOCK
+User Prog  Running Test... PID = 2
+Yalnix     TRAP_CLOCK
+User Prog  Running Idle... PID = 1
+Yalnix     TRAP_CLOCK
+User Prog  Running Test... PID = 2
+Yalnix     TRAP_CLOCK
+User Prog  Running Idle... PID = 1
