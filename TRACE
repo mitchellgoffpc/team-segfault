@@ -1,4 +1,5 @@
 ** Yalnix level 5 tracing enabled **
+** User Prog level 5 tracing enabled **
 Yalnix     Called SetKernelData
 Yalnix     Changed KERNEL_BRK to 30000
 Yalnix     Called KernelStart
@@ -7,7 +8,7 @@ Yalnix     Initializing FRC table
 Yalnix     Initializing frame list
 Yalnix     Initializing kernel page table
 Yalnix     Enabling virtual memory...
-Yalnix     Page Table Address: 26100
+Yalnix     Page Table Address: 26F60
 Yalnix     Kernel Brk: 30000
 Yalnix     PTE 0: 0
 Yalnix     PTE 1: 1
@@ -137,8 +138,8 @@ Yalnix     PTE 124: 0
 Yalnix     PTE 125: 0
 Yalnix     PTE 126: 7E
 Yalnix     PTE 127: 7F
-Yalnix     Getting read to load 'init'...
-Yalnix     Loading program 'apps/init'
+Yalnix     Getting read to load 'idle'...
+Yalnix     Loading program 'apps/idle'
 Yalnix     LoadProgram: argsize 0, argcount 0
 Yalnix     prog_size 4, text 2 data 1 bss 1 pages
 Yalnix     LoadProgram: heap_size 4, stack_size 1
@@ -281,9 +282,54 @@ Yalnix     PTE 124: 0
 Yalnix     PTE 125: 0
 Yalnix     PTE 126: 0
 Yalnix     PTE 127: 1C
+Yalnix     TRAP_KERNEL
+Yalnix     Getting read to fork...
+Yalnix     Creating a new process descriptor...
+Yalnix     Allocating a page frame...
+Yalnix     Allocated a page frame at 3A000
+Yalnix     Allocating a page frame...
+Yalnix     Allocated a page frame at 3C000
+Yalnix     Successfully created process descriptor!
+Yalnix     Allocating a page frame...
+Yalnix     Allocated a page frame at 3E000
+Yalnix     Finished forking!
+User Prog  Returned from fork! Child's PID: 2
+Yalnix     TRAP_KERNEL
+User Prog  Running Idle... PID = 1
+User Prog  test = 32
 Yalnix     TRAP_CLOCK
+Yalnix     Finished forking!
+User Prog  Returned from fork! Child's PID: 0
+Yalnix     Allocating a page frame...
+Yalnix     Allocated a page frame at 40000
+Yalnix     TRAP_KERNEL
+User Prog  Running Idle... PID = 2
+User Prog  test = 48
 Yalnix     TRAP_CLOCK
+Yalnix     TRAP_KERNEL
+User Prog  Running Idle... PID = 1
+User Prog  test = 32
 Yalnix     TRAP_CLOCK
+Yalnix     TRAP_KERNEL
+User Prog  Running Idle... PID = 2
+User Prog  test = 48
 Yalnix     TRAP_CLOCK
+Yalnix     TRAP_KERNEL
+User Prog  Running Idle... PID = 1
+User Prog  test = 32
 Yalnix     TRAP_CLOCK
+Yalnix     TRAP_KERNEL
+User Prog  Running Idle... PID = 2
+User Prog  test = 48
 Yalnix     TRAP_CLOCK
+Yalnix     TRAP_KERNEL
+User Prog  Running Idle... PID = 1
+User Prog  test = 32
+Yalnix     TRAP_CLOCK
+Yalnix     TRAP_KERNEL
+User Prog  Running Idle... PID = 2
+User Prog  test = 48
+Yalnix     TRAP_CLOCK
+Yalnix     TRAP_KERNEL
+User Prog  Running Idle... PID = 1
+User Prog  test = 32

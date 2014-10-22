@@ -27,60 +27,17 @@
 
 /* =============================== *
 
-              Macros
-
- * =============================== */
-
-#define errorIfNull(var) \
-    if ((var) == NULL) { \
-        close(fd); \
-        return ERROR; \
-    }
-
-#define killIfNull(var) \
-    if ((var) == NULL) { \
-        close(fd); \
-        return KILL; \
-    }
-
-
-
-
-
-/* =============================== *
-
            Implementation
 
  * =============================== */
 
 /*
-  Deallocate all of the page frames that this process is currently using.
+  Load a program into an existing address space. The program comes from
+  the Linux file named "name", and its arguments come from the array at
+  "args", which is in standard argv format. The argument "proc" points
+  to the process or PCB structure for the process into which the program
+  is to be loaded.
 */
-
-void freeAddressSpace() {
-    ProcessDescriptor *process = getCurrentProcess();
-    PageTable *page_table = process->page_table;
-
-    // Go through the page table and free any valid page frames
-    for (int i=0; i<indexOfPage(VMEM_REGION_SIZE); i++) {
-        PTE entry = page_table->entries[i];
-        if (!entry.valid) continue;
-        freePageFrame((void *) pageAtIndex(entry.pfn));
-    }
-
-    // Clear all entries in the page table
-    clearPageTable(page_table);
-}
-
-
-
-/*
- *    Load a program into an existing address space. The program comes from
- *    the Linux file named "name", and its arguments come from the array at
- *    "args", which is in standard argv format. The argument "proc" points
- *    to the process or PCB structure for the process into which the program
- *    is to be loaded.
- */
 
 int loadProgram(char *name, char *args[]) {
     
@@ -186,13 +143,13 @@ int loadProgram(char *name, char *args[]) {
 
     // Set the new stack pointer value in the process's exception frame.
     TracePrintf(1, "Looking good! Now it's time to load the program into memory\n");
-    process->context->sp = cp2;
+    process->user_context.sp = cp2;
 
     
     // Now save the arguments in a separate buffer in region 0, since
     // region 1 doesn't exist yet for this process
     cp2 = argbuf = (char *) malloc(size);
-    errorIfNull(argbuf);
+    errorIfNull(argbuf, "There's no more space in the heap\n");
 
     for (i=0; args[i] != NULL; i++) {
         TracePrintf(3, "saving arg %d = '%s'\n", i, args[i]);
@@ -218,17 +175,17 @@ int loadProgram(char *name, char *args[]) {
     // Now allocate some physical pages and map them to the right places
     // in text, data and stack segments, marking everything as writable
     for (i=0; i<li.t_npg; i++) {
-        void *frame = allocatePageFrame(); killIfNull(frame);
+        void *frame = allocatePageFrame(); killIfNull(frame, "We're out of page frames\n");
         PTE entry = createPTEWithOptions(data_options, indexOfPage(frame));
         process->page_table->entries[text_pg1 + i] = entry;
     }
     for (i=0; i<data_npg; i++) {
-        void *frame = allocatePageFrame(); killIfNull(frame);
+        void *frame = allocatePageFrame(); killIfNull(frame, "We're out of page frames\n");
         PTE entry = createPTEWithOptions(data_options, indexOfPage(frame));
         process->page_table->entries[data_pg1 + i] = entry;
     }
     for (i=0; i<stack_npg; i++) {
-        void *frame = allocatePageFrame(); killIfNull(frame);
+        void *frame = allocatePageFrame(); killIfNull(frame, "We're out of page frames\n");
         PTE entry = createPTEWithOptions(data_options, indexOfPage(frame));
         process->page_table->entries[stack_pg1 + i] = entry;
     }
@@ -282,7 +239,7 @@ int loadProgram(char *name, char *args[]) {
 
 
     // Set the entry point in the user context
-    process->context->pc = (caddr_t) li.entry;
+    process->user_context.pc = (caddr_t) li.entry;
     
     // Now, finally, build the argument list on the new stack.
     #ifdef LINUX

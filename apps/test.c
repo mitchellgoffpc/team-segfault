@@ -1,5 +1,5 @@
 /*
-  File: init_process.c
+  File: test.c
   Date: 10/6/2014
   Author: Mitchell Goff
 */
@@ -13,6 +13,7 @@
  * =============================== */
 
 #include "../include/hardware.h"
+#include "../include/yalnix.h"
 
 
 
@@ -25,6 +26,10 @@
  * =============================== */
 
 int main() {
-	while (1) Pause();
+
+	while (1) {
+		TracePrintf(1, "Running Test... PID = %d\n", GetPid());
+		Pause();
+	}
 	return 0;
 }

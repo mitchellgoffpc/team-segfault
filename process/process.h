@@ -32,8 +32,8 @@
 
  * =============================== */
 
-#define ERROR -1
-#define KILL -2
+#define ERROR (-1)
+#define KILL (-2)
 #define SUCCESS 0
 
 extern long max_pid;
@@ -131,8 +131,10 @@ struct ProcessInfo {
   waitqueue:    A linked list node that can be hooked onto by a waitqueue
 
   page_table:   The REGION_1 page table for this process
-  context:      The UserContext for this process. We need to save this whenever we
-                switch processes so we can use it later on to resume the process
+  user_context: The UserContext for this process. We need to save this whenever we
+                switch to kernel mode so we can use it later on to resume the process
+  kernel_context: The KernelContext for this process. We need to save this whenever
+                we switch processes so we can use it later on to resume the process
 */
 
 struct ProcessDescriptor {
@@ -153,7 +155,8 @@ struct ProcessDescriptor {
     struct WaitQueueNode *waitqueue;
 
     PageTable *page_table;
-    UserContext *context;
+    UserContext user_context;
+    KernelContext kernel_context;
 };
 
 
@@ -190,22 +193,45 @@ union ProcessControlBlock {
 
 
 
+// Save the current user context into the process descriptor
+#define saveUserContext() \
+    memcpy(&getCurrentProcess()->user_context, context, sizeof(UserContext));
+
+#define restoreUserContext() \
+    memcpy(context, &getCurrentProcess()->user_context, sizeof(UserContext));
+
+
+
+
+// Return an error code if the value is null
+#define errorIfNull(value, message) \
+    if (!value) { \
+        TracePrintf(1, message); \
+        return ERROR; \
+    }
+
+// Return a kill code if the value is null
+#define killIfNull(value, message) \
+    if (!value) { \
+        TracePrintf(1, message); \
+        return KILL; \
+    }
+
+// Halt the machine if the value is null
+#define haltIfNull(value, message) \
+    if (!value) { \
+        TracePrintf(1, message); \
+        Halt(); \
+    }
+
+
+
+
+
+
 /*
   Some macros to create a new process descriptor
 */
-
-// Statically initialize a new linked list node
-#define processDescriptor(name) {                                                       \
-    nextAvailablePID(),                                                                 \
-                                                                                        \
-    PROCESS_RUNNING, KERNEL_STACK_BASE,                                                 \
-                                                                                        \
-    NULL, linkedListNode(&(name)->children), linkedListNode(&(name)->siblings),         \
-    NULL, linkedListNode(&(name)->thread_group), linkedListNode(&(name)->thread_peers), \
-                                                                                        \
-    linkedListNode(&(name)->process_list), NULL,                                        \
-    NULL, NULL                                                                          \
-}
 
 // Dynamically initialize a new linked list node
 static inline void processDescriptorInit(ProcessDescriptor *process) {
@@ -232,10 +258,19 @@ static inline void processDescriptorInit(ProcessDescriptor *process) {
 
  * =============================== */
 
-void freeAddressSpace();
+KernelContext* cloneKernelContext(KernelContext *context, void *a, void *b);
+KernelContext* switchKernelContext(KernelContext *context, void *a, void *b);
+void schedule();
+
+
+int forkProcess();
+int loadProgram(char *name, char *args[]);
+
 
 ProcessDescriptor* createProcessDescriptor();
-int loadProgram(char *name, char *args[]);
+void setCopyOnWrite(PageTable *table, int is_child);
+void freeAddressSpace();
+
 int createThread();
 
 int killProcess(ProcessDescriptor* process);

@@ -21,20 +21,25 @@
 ALL = $(KERNEL_ALL) $(USER_APPS)
 KERNEL_ALL = yalnix
 
+
+KERNEL_PROCESS_SRCS = process/process.c process/load.c process/fork.c process/switch.c
+KERNEL_PROCESS_OBJS = process/process.o process/load.o process/fork.o process/switch.o
+
+
 #List all kernel source files here.  
-KERNEL_SRCS = init/init.c init/init_memory.c memory/memory.c traps/traps.c process/process.c process/load.c
+KERNEL_SRCS = init/init.c init/init_memory.c memory/memory.c traps/traps.c $(KERNEL_PROCESS_SRCS)
 #List the objects to be formed form the kernel source files here.  Should be the same as the previous list, replacing ".c" with ".o"
-KERNEL_OBJS = init/init.o init/init_memory.o memory/memory.o traps/traps.o process/process.o process/load.o
+KERNEL_OBJS = init/init.o init/init_memory.o memory/memory.o traps/traps.o $(KERNEL_PROCESS_OBJS)
 #List all of the header files necessary for your kernel
 KERNEL_INCS = core/list.h memory/memory.h traps/traps.h process/process.h
 
 
 #List all user programs here.
-USER_APPS = apps/init
+USER_APPS = apps/idle apps/test
 #List all user program source files here.  Should be the same as the previous list, with ".c" added to each file
-USER_SRCS = apps/init.c
+USER_SRCS = apps/idle.c apps/test.c
 #List the objects to be formed form the user  source files here.  Should be the same as the previous list, replacing ".c" with ".o"
-USER_OBJS = apps/init.o
+USER_OBJS = apps/idle.o apps/test.o
 #List all of the header files necessary for your user programs
 USER_INCS = 
 

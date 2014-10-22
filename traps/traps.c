@@ -8,19 +8,24 @@
 
 /* =============================== *
 
-  	          Includes
+              Includes
 
  * =============================== */
 
 #include "../include/hardware.h"
+#include "../include/yalnix.h"
+
+#include "../memory/memory.h"
+#include "../process/process.h"
 #include "traps.h"
+
 
 
 
 
 /* =============================== *
 
-  	         Interrupts
+             Interrupts
 
  * =============================== */
 
@@ -29,8 +34,11 @@
 */
 
 void trapClock(UserContext *context) {
-  TracePrintf(1, "TRAP_CLOCK\n");
-	// schedule();
+    TracePrintf(1, "TRAP_CLOCK\n");
+
+    saveUserContext();
+    schedule();
+    restoreUserContext();
 }
 
 
@@ -41,8 +49,8 @@ void trapClock(UserContext *context) {
 */
 
 void trapDisk(UserContext *context) {
-  TracePrintf(1, "TRAP_DISK\n");
-	// pass
+    TracePrintf(1, "TRAP_DISK\n");
+    // pass
 }
 
 
@@ -53,8 +61,8 @@ void trapDisk(UserContext *context) {
 */
 
 void trapTtyReceive(UserContext *context) {
-  TracePrintf(1, "TRAP_TTY_RECEIVE\n");
-	// pass
+    TracePrintf(1, "TRAP_TTY_RECEIVE\n");
+    // pass
 }
 
 
@@ -65,8 +73,8 @@ void trapTtyReceive(UserContext *context) {
 */
 
 void trapTtyTransmit(UserContext *context) {
-  TracePrintf(1, "TRAP_TTY_TRANSMIT\n");
-	// pass
+    TracePrintf(1, "TRAP_TTY_TRANSMIT\n");
+    // pass
 }
 
 
@@ -75,7 +83,7 @@ void trapTtyTransmit(UserContext *context) {
 
 /* =============================== *
 
-  	           Traps
+               Traps
 
  * =============================== */
 
@@ -84,14 +92,29 @@ void trapTtyTransmit(UserContext *context) {
 */
 
 void trapKernel(UserContext *context) {
-  TracePrintf(1, "TRAP_KERNEL\n");
-	int call_number = context->regs[0];
+    TracePrintf(1, "TRAP_KERNEL\n");
+    saveUserContext();
+    int result;
 
-	// load the requested kernel call
-	// execute the requested kernel call
-	// save the return value from the kernel call in regs[0]
+    switch(context->code) {
+        case YALNIX_FORK:
+            result = forkProcess();
+            getCurrentProcess()->user_context.regs[0] = result;
+            break;
+        
+        case YALNIX_EXEC:
+            result = loadProgram(
+                (char *) getCurrentProcess()->user_context.regs[0],
+                (char **) getCurrentProcess()->user_context.regs[1]);
+            getCurrentProcess()->user_context.regs[0] = result;
+            break;
 
-	// UserContext.regs[0] = return val
+        case YALNIX_GETPID:
+            getCurrentProcess()->user_context.regs[0] = getCurrentProcess()->pid;
+            break;
+    }
+
+    restoreUserContext();
 }
 
 
@@ -100,7 +123,7 @@ void trapKernel(UserContext *context) {
 
 /* =============================== *
 
-  	         Exceptions
+             Exceptions
 
  * =============================== */
 
@@ -109,9 +132,10 @@ void trapKernel(UserContext *context) {
 */
 
 void trapIllegal(UserContext *context) {
-  TracePrintf(1, "TRAP_ILLEGAL\n");
-	// kill the current process
-	// TracePrintf(message: process ID and explanation of problem)
+    TracePrintf(1, "TRAP_ILLEGAL\n");
+    Halt();
+    // kill the current process
+    // TracePrintf(message: process ID and explanation of problem)
 }
 
 
@@ -122,9 +146,9 @@ void trapIllegal(UserContext *context) {
 */
 
 void trapMath(UserContext *context) {
-  TracePrintf(1, "TRAP_MATH\n");
-  // kill the process
-  // TracePrintf(message: process ID and explanation of problem)
+    TracePrintf(1, "TRAP_MATH\n");
+    // kill the process
+    // TracePrintf(message: process ID and explanation of problem)
 }
 
 
@@ -136,6 +160,51 @@ void trapMath(UserContext *context) {
 */
 
 void trapMemory(UserContext *context) {
-  TracePrintf(1, "TRAP_MEMORY\n");
-	void *addr = context->addr;
+    // TracePrintf(1, "TRAP_MEMORY\n");
+    saveUserContext();
+    
+    void *address = getCurrentProcess()->user_context.addr;
+    int index = indexOfPage(DOWN_TO_PAGE(address) - VMEM_1_BASE);
+    PTE old_entry = getCurrentProcess()->page_table->entries[index];
+
+    // If the user is trying to write to a copy-on-write page...
+    if ((old_entry.misc << 4) & PTE_COPY_ON_WRITE) {
+
+        long options = PTE_VALID | (old_entry.perm << 1) | (old_entry.misc << 4);
+
+        // If there are more than once processes sharing this page...
+        if (frc_table[old_entry.pfn] > 1) {
+            frc_table[old_entry.pfn] -= 1;
+            void *frame = allocatePageFrame();
+            haltIfNull(frame, "We're out of page frames!\n");
+
+            long frame_window_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
+            frame_window_pte(0) = createPTEWithOptions(frame_window_options, indexOfPage(frame));
+            memcpy(frame_window(0), (void *) DOWN_TO_PAGE(address), PAGESIZE);
+
+            options = (options & ~PTE_COPY_ON_WRITE) | PTE_PERM_WRITE;
+            PTE entry = createPTEWithOptions(options, indexOfPage(frame));
+            getCurrentProcess()->page_table->entries[index] = entry;
+        }
+
+        // Otherwise, we can just unset the copy-on-write bit.
+        else {
+            options = (options & ~PTE_COPY_ON_WRITE) | PTE_PERM_WRITE;
+            PTE entry = createPTEWithOptions(options, old_entry.pfn);
+            getCurrentProcess()->page_table->entries[index] = entry;
+        }
+    }
+
+    // If the user is allocating more space for the stack...
+    else if (DOWN_TO_PAGE(context->sp) <= (long)address) {
+        void *frame = allocatePageFrame();
+        haltIfNull(frame, "Couldn't find any more physical pages\n");
+
+        long options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
+        PTE entry = createPTEWithOptions(options, indexOfPage(frame));
+        getCurrentProcess()->page_table->entries[index] = entry;
+    }
+
+    WriteRegister(REG_TLB_FLUSH, TLB_FLUSH_1);
+    restoreUserContext();
 }

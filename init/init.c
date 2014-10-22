@@ -43,15 +43,6 @@ InterruptHandler interrupt_vector[TRAP_VECTOR_SIZE];
 
  * =============================== */
 
-// A dummy idle program for testing
-void DoIdle() {
-	TracePrintf(1, "DoIdle\n");
-	while(1) { }
-}
-
-
-
-
 /*
   Initialize the interrupt vector
 */
@@ -82,44 +73,44 @@ void initializeInterruptVector() {
 */
 
 void loadInit(UserContext *context) {
-	TracePrintf(1, "Getting read to load 'init'...\n");
+	TracePrintf(1, "Getting read to load 'idle'...\n");
 
 	// Try to allocate space for the REGION_1 page table
 	PageTable *table = (PageTable *) malloc(sizeof(PageTable));
-	if (!table) {
-    	TracePrintf(1, "Couldn't find enough space for a new process descriptor!\n");
-    	Halt();
-    }
+	haltIfNull(table, "There's not enough space for a new page table!\n");
+    clearPageTable(table);
 
 	// Try to allocate space for the process descriptor
 	ProcessDescriptor *process = (ProcessDescriptor *) malloc(sizeof(ProcessDescriptor));
-    if (!process) {
-    	TracePrintf(1, "Couldn't find enough space for a new process descriptor!\n");
-    	Halt();
-    }
-
-    clearPageTable(table);
+    haltIfNull(table, "There's not enough space for a new process descriptor!\n");
     processDescriptorInit(process);
-
 
     // Keep a record of which page frames the new kernel stack was allocated in
     for (int i=0; i<indexOfPage(KERNEL_STACK_MAXSIZE); i++) {
     	process->pcb_frames[i] = (void *) (KERNEL_STACK_BASE + (long)pageAtIndex(i));
     }
 
+
     // Update the process descriptor and tell the machine where the REGION_1
     // page table is located
     process->page_table = table;
-    process->context = context;
+    memcpy(&process->user_context, context, sizeof(UserContext));
+
     ((ProcessInfo *) KERNEL_STACK_BASE)->descriptor = process;
+    addLastNode(&process->process_list, &process_head);
 
     WriteRegister(REG_PTBR1, (long)table);
 	WriteRegister(REG_PTLR1, VMEM_REGION_SIZE >> PAGESHIFT);
 
 
-	// DoIdle();
+	// Load init into memory and start running it
 	char *args = NULL;
-	loadProgram("apps/init", &args);
+	if (loadProgram("apps/idle", &args) < 0) {
+		TracePrintf(0, "Idle failed to load :(\n");
+		Halt();
+	}
+
+	memcpy(context, &process->user_context, sizeof(UserContext));
 }
 
 
