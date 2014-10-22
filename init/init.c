@@ -43,8 +43,7 @@ InterruptHandler interrupt_vector[TRAP_VECTOR_SIZE];
 
  * =============================== */
 
-<<<<<<< HEAD
-=======
+
 // A dummy idle program for testing
 void DoIdle() {
 	
@@ -86,7 +85,7 @@ void KernelDelay(UserContext *context) {
 }
 
 
->>>>>>> FETCH_HEAD
+
 /*
   Initialize the interrupt vector
 */
@@ -192,7 +191,6 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 	WriteRegister(REG_VECTOR_BASE, (long)interrupt_vector);
 	initializeInterruptVector();
 
-
 	// Initialize the page table
 	TracePrintf(2, "Creating Page Tables\n");
 	PMEM_SIZE = pmem_size;
@@ -216,6 +214,9 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 
 	WriteRegister(REG_VM_ENABLE, 1);
 	VIRTUAL_MEMORY_ENABLED = 1;
+
+	//start our clock
+	ellapsed_clock_ticks = 0;
 
 	// Start the init process
 	loadInit(context);
