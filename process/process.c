@@ -146,12 +146,17 @@ int delayProcess(int ticks) {
         return ERROR;
     }
 
-    // Block the calling process until clock_ticks clock interrupts have occurred
-    int counter = 0;
-    while (counter < ticks) {
+    // Block the calling process until clock_ticks 
+    // clock interrupts have occurred
+
+    //set the calling process' wake up time to 
+    //ellapsed_clock_ticks + ticks
+
+    while ( < ellapsed_clock_ticks) {
         //put the idle process on the ready queue
         //call a trapClock to kill the switch to
         //the next process on the ready queue
         //which will be doIdle
+        //trapClock();
     }
 }
