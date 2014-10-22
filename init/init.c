@@ -43,22 +43,7 @@ InterruptHandler interrupt_vector[TRAP_VECTOR_SIZE];
 
  * =============================== */
 
-<<<<<<< HEAD
 
-// A dummy idle program for testing
-void DoIdle() {
-	
-	while(1) { 
-		TracePrintf(1, "DoIdle\n");
-		Pause();
-	}
-}
-
-
-
-
-=======
->>>>>>> FETCH_HEAD
 /*
   Initialize the interrupt vector
 */
@@ -188,10 +173,6 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 	WriteRegister(REG_VM_ENABLE, 1);
 	VIRTUAL_MEMORY_ENABLED = 1;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> FETCH_HEAD
 	// Start the init process
 	loadInit(context);
 }
