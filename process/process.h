@@ -111,6 +111,8 @@ struct ProcessInfo {
 
   pid:          The unique ID of the process. Ranges from 0 and PID_MAX
   state:        The current state of the process
+  wake_up_time: The amount of time we need to wait for the process to wake up
+
   info:         Some low-level information about the process. This is also a pointer
                 to the Process Control Block, in case we ever need it
 
@@ -271,6 +273,7 @@ int loadProgram(char *name, char *args[]);
 ProcessDescriptor* createProcessDescriptor();
 void setCopyOnWrite(PageTable *table, int is_child);
 void freeAddressSpace();
+int delayProcess(int ticks);
 
 int createThread();
 

@@ -27,6 +27,8 @@
 
 int main() {
 
+	Delay(10);
+
 	while (1) {
 		TracePrintf(1, "Running Test... PID = %d\n", GetPid());
 		Pause();

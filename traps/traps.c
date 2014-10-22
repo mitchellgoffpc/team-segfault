@@ -8,7 +8,7 @@
 
 /* =============================== *
 
-              Includes
+             Includes
 
  * =============================== */
 
@@ -18,6 +18,18 @@
 #include "../memory/memory.h"
 #include "../process/process.h"
 #include "traps.h"
+
+
+
+
+
+/* =============================== *
+
+               Data
+
+ * =============================== */
+
+long elapsed_clock_ticks = 0;
 
 
 
@@ -35,9 +47,11 @@
 
 void trapClock(UserContext *context) {
     TracePrintf(1, "TRAP_CLOCK\n");
-
     saveUserContext();
+    
+    elapsed_clock_ticks++;
     schedule();
+    
     restoreUserContext();
 }
 
@@ -111,6 +125,11 @@ void trapKernel(UserContext *context) {
 
         case YALNIX_GETPID:
             getCurrentProcess()->user_context.regs[0] = getCurrentProcess()->pid;
+            break;
+
+        case YALNIX_DELAY:
+            getCurrentProcess()->user_context.regs[0] = delayProcess(
+                getCurrentProcess()->user_context.regs[0]);
             break;
     }
 
