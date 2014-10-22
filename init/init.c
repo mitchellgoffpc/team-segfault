@@ -79,7 +79,7 @@ void KernelDelay(UserContext *context) {
 		//call a trapClock to kill the switch to
 		//the next process on the ready queue
 		//which will be doIdle 
-		
+		counter++;
 	}
 	
 
