@@ -218,8 +218,6 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 	WriteRegister(REG_VM_ENABLE, 1);
 	VIRTUAL_MEMORY_ENABLED = 1;
 
-	//start our clock
-	ellapsed_clock_ticks = 0;
 
 	// Start the init process
 	loadInit(context);
