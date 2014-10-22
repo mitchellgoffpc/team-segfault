@@ -70,7 +70,7 @@ void freeAddressSpace() {
 
 void setCopyOnWrite(PageTable *table, int is_child) {
 
-    int stack_base = (long)(getCurrentProcess()->user_context.sp - VMEM_1_BASE) >> PAGESHIFT;
+    int stack_base = ((long)getCurrentProcess()->user_context.sp - VMEM_1_BASE) >> PAGESHIFT;
     for (int i=0; i<stack_base; i++) {
         PTE old_entry = table->entries[i];
         if (!old_entry.valid) continue;
@@ -129,4 +129,29 @@ ProcessDescriptor* createProcessDescriptor() {
 
     TracePrintf(2, "Successfully created process descriptor!\n");
     return process;
+}
+
+
+
+
+/*  
+  Delay the calling process for the given number of clock ticks
+*/
+
+int delayProcess(int ticks) {
+    if (ticks == 0) return SUCCESS;
+
+    if (ticks < 0) {
+        TracePrintf(1, "Hey, we can't go back in time!\n");
+        return ERROR;
+    }
+
+    // Block the calling process until clock_ticks clock interrupts have occurred
+    int counter = 0;
+    while (counter < ticks) {
+        //put the idle process on the ready queue
+        //call a trapClock to kill the switch to
+        //the next process on the ready queue
+        //which will be doIdle
+    }
 }

@@ -49,7 +49,7 @@ int forkProcess() {
 
 
     // Make a copy of the parent's stack, since we know we'll need that right away
-    int stack_base = (long)(getCurrentProcess()->user_context.sp - VMEM_1_BASE) >> PAGESHIFT;
+    int stack_base = ((long)getCurrentProcess()->user_context.sp - VMEM_1_BASE) >> PAGESHIFT;
     for (int i=stack_base; i<indexOfPage(VMEM_REGION_SIZE); i++) {
         PTE old_entry = parent->page_table->entries[i];
         if (!old_entry.valid) continue;

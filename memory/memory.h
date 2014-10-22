@@ -138,6 +138,7 @@ void kernelBrk(UserContext *context);
 
 PTE createPTEWithOptions(long options, long frame_number);
 void clearPageTable(PageTable *table);
+void handleMemoryTrap(void *address);
 
 void* allocatePageFrame();
 void freePageFrame(void *frame);

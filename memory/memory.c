@@ -12,9 +12,11 @@
 
  * =============================== */
 
+#include <stdlib.h>
 #include <string.h>
 
 #include "../core/list.h"
+#include "../process/process.h"
 #include "memory.h"
 
 
@@ -60,6 +62,71 @@ PTE createPTEWithOptions(long options, long frame_number) {
 // Helper function to mark every entry in this table as invalid
 void clearPageTable(PageTable *table) {
 	memset(table, 0x00, indexOfPage(VMEM_REGION_SIZE) * sizeof(PTE));
+}
+
+
+
+
+
+/* =============================== *
+
+  	    Memory Trap Handler
+
+ * =============================== */
+
+void handleMemoryTrap(void *address) {
+    int index = indexOfPage(DOWN_TO_PAGE(address) - VMEM_1_BASE);
+    PTE old_entry = getCurrentProcess()->page_table->entries[index];
+    UserContext *context = &getCurrentProcess()->user_context;
+
+    // If the user is trying to write to a copy-on-write page...
+    if ((old_entry.misc << 4) & PTE_COPY_ON_WRITE) {
+
+        long options = PTE_VALID | (old_entry.perm << 1) | (old_entry.misc << 4);
+
+        // If there are more than once processes sharing this page...
+        if (frc_table[old_entry.pfn] > 1) {
+            
+        	// Decrement the frc and allocate a new frame
+            frc_table[old_entry.pfn] -= 1;
+            void *frame = allocatePageFrame();
+            haltIfNull(frame, "We're out of page frames!\n");
+
+            // Copy the old page to the new one
+            long frame_window_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
+            frame_window_pte(0) = createPTEWithOptions(frame_window_options, indexOfPage(frame));
+            memcpy(frame_window(0), (void *) DOWN_TO_PAGE(address), PAGESIZE);
+
+            // Update the page table
+            options = (options & ~PTE_COPY_ON_WRITE) | PTE_PERM_WRITE;
+            PTE entry = createPTEWithOptions(options, indexOfPage(frame));
+            getCurrentProcess()->page_table->entries[index] = entry;
+        }
+
+
+        // Otherwise, we can just unset the copy-on-write bit.
+        else {
+            options = (options & ~PTE_COPY_ON_WRITE) | PTE_PERM_WRITE;
+            PTE entry = createPTEWithOptions(options, old_entry.pfn);
+            getCurrentProcess()->page_table->entries[index] = entry;
+        }
+    }
+
+
+
+    // If the user is allocating more space for the stack...
+    else if (DOWN_TO_PAGE(context->sp) <= (long)address) {
+    	// Allocate a new frame
+        void *frame = allocatePageFrame();
+        haltIfNull(frame, "Couldn't find any more physical pages\n");
+
+        // Update the page table
+        long options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
+        PTE entry = createPTEWithOptions(options, indexOfPage(frame));
+        getCurrentProcess()->page_table->entries[index] = entry;
+    }
+
+    WriteRegister(REG_TLB_FLUSH, TLB_FLUSH_1);
 }
 
 
