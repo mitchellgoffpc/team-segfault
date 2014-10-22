@@ -147,6 +147,7 @@ void trapIllegal(UserContext *context) {
 
 void trapMath(UserContext *context) {
     TracePrintf(1, "TRAP_MATH\n");
+    Halt();
     // kill the process
     // TracePrintf(message: process ID and explanation of problem)
 }
