@@ -98,8 +98,6 @@ static int decreaseBrk(void *address) {
 }
 
 
-
-
 /* 
   Method: sets the lowest location not used by the program
 */
