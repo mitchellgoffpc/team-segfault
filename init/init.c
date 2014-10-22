@@ -43,6 +43,52 @@ InterruptHandler interrupt_vector[TRAP_VECTOR_SIZE];
 
  * =============================== */
 
+<<<<<<< HEAD
+=======
+
+// A dummy idle program for testing
+void DoIdle() {
+	
+	while(1) { 
+		TracePrintf(1, "DoIdle\n");
+		Pause();
+	}
+}
+
+/*	
+Method: delay the calling process for the given number of clock ticks
+*/
+
+void KernelDelay(UserContext *context) {
+	int clock_ticks;
+	clock_ticks = context->regs[0];
+
+	//if clock_ticks is 0 return immediately
+	if (clock_ticks == 0) return 0;
+
+	//if clock_ticks < 0 don't time travel, return an Error
+	if (clock_ticks < 0) {
+		TracePrintf(1, "Hey! We can't go back in time!\n");
+		return -1;
+	}
+
+	//block the calling process until clock_ticks clock interrupts have occurred
+	int counter;
+	counter = 0;
+	while (counter < clock_ticks) {
+		//put the idle process on the ready queue
+		//call a trapClock to kill the switch to
+		//the next process on the ready queue
+		//which will be doIdle 
+		counter++;
+	}
+	
+
+}
+
+
+
+>>>>>>> FETCH_HEAD
 /*
   Initialize the interrupt vector
 */
@@ -148,7 +194,6 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 	WriteRegister(REG_VECTOR_BASE, (long)interrupt_vector);
 	initializeInterruptVector();
 
-
 	// Initialize the page table
 	TracePrintf(2, "Creating Page Tables\n");
 	PMEM_SIZE = pmem_size;
@@ -172,6 +217,9 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 
 	WriteRegister(REG_VM_ENABLE, 1);
 	VIRTUAL_MEMORY_ENABLED = 1;
+
+	//start our clock
+	ellapsed_clock_ticks = 0;
 
 	// Start the init process
 	loadInit(context);

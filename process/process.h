@@ -139,6 +139,7 @@ struct ProcessInfo {
 
 struct ProcessDescriptor {
     PID pid;
+    long wake_up_time;
 
     enum ProcessState state;
     void *pcb_frames[KERNEL_STACK_MAXSIZE >> PAGESHIFT];
