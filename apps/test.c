@@ -12,6 +12,8 @@
 
  * =============================== */
 
+#include <stdlib.h>
+
 #include "../include/hardware.h"
 #include "../include/yalnix.h"
 
@@ -27,11 +29,10 @@
 
 int main() {
 
-	Delay(10);
-
 	while (1) {
 		TracePrintf(1, "Running Test... PID = %d\n", GetPid());
 		Pause();
 	}
 	return 0;
+	
 }

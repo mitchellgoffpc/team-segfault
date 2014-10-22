@@ -133,7 +133,7 @@ void initKernelPageTable();
 void initFRCTable();
 
 
-void kernelBrk(UserContext *context);
+int setProcessBrk(void *address);
 
 
 PTE createPTEWithOptions(long options, long frame_number);

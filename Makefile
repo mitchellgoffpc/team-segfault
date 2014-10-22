@@ -27,9 +27,9 @@ KERNEL_PROCESS_OBJS = process/process.o process/load.o process/fork.o process/sw
 
 
 #List all kernel source files here.  
-KERNEL_SRCS = init/init.c init/init_memory.c memory/memory.c traps/traps.c $(KERNEL_PROCESS_SRCS)
+KERNEL_SRCS = init/init.c init/init_memory.c memory/memory.c memory/brk.c traps/traps.c $(KERNEL_PROCESS_SRCS)
 #List the objects to be formed form the kernel source files here.  Should be the same as the previous list, replacing ".c" with ".o"
-KERNEL_OBJS = init/init.o init/init_memory.o memory/memory.o traps/traps.o $(KERNEL_PROCESS_OBJS)
+KERNEL_OBJS = init/init.o init/init_memory.o memory/memory.o memory/brk.o traps/traps.o $(KERNEL_PROCESS_OBJS)
 #List all of the header files necessary for your kernel
 KERNEL_INCS = core/list.h memory/memory.h traps/traps.h process/process.h
 

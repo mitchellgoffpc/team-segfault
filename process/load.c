@@ -166,9 +166,9 @@ int loadProgram(char *name, char *args[]) {
     int data_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
     freeAddressSpace();
 
-    ((ProcessInfo *) KERNEL_STACK_BASE)->data_start = pageAtIndex(data_pg1);
-    ((ProcessInfo *) KERNEL_STACK_BASE)->heap_start = pageAtIndex(data_pg1 + data_npg);
-    ((ProcessInfo *) KERNEL_STACK_BASE)->current_brk = pageAtIndex(data_pg1 + data_npg);
+    ((ProcessInfo *) KERNEL_STACK_BASE)->data_start = pageAtIndex(data_pg1) + VMEM_1_BASE;
+    ((ProcessInfo *) KERNEL_STACK_BASE)->heap_start = pageAtIndex(data_pg1 + data_npg) + VMEM_1_BASE;
+    ((ProcessInfo *) KERNEL_STACK_BASE)->current_brk = pageAtIndex(data_pg1 + data_npg) + VMEM_1_BASE;
 
 
 

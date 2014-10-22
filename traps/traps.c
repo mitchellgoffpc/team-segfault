@@ -131,6 +131,11 @@ void trapKernel(UserContext *context) {
             getCurrentProcess()->user_context.regs[0] = delayProcess(
                 getCurrentProcess()->user_context.regs[0]);
             break;
+
+        case YALNIX_BRK:
+            getCurrentProcess()->user_context.regs[0] = setProcessBrk(
+                (void *) getCurrentProcess()->user_context.regs[0]);
+            break;
     }
 
     restoreUserContext();

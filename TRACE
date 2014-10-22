@@ -8,7 +8,7 @@ Yalnix     Initializing FRC table
 Yalnix     Initializing frame list
 Yalnix     Initializing kernel page table
 Yalnix     Enabling virtual memory...
-Yalnix     Page Table Address: 27060
+Yalnix     Page Table Address: 27540
 Yalnix     Kernel Brk: 30000
 Yalnix     PTE 0: 0
 Yalnix     PTE 1: 1
@@ -439,26 +439,35 @@ Yalnix     PTE 124: 0
 Yalnix     PTE 125: 0
 Yalnix     PTE 126: 0
 Yalnix     PTE 127: 23
-User Prog  Running Idle... PID = 1
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 1
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 1
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 1
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 1
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 1
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 1
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 1
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 1
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 1
-Yalnix     TRAP_CLOCK
+User Prog  HEAP my_malloc(0x2000)
+User Prog  warning: unitialized heap!
+User Prog  initializing heap
+User Prog  brk_unlocked(10e690)
+Yalnix     address = 110000; current_brk = 108000
+Yalnix     Allocating a page frame...
+Yalnix     Allocated a page frame at 48000
+Yalnix     Allocating a page frame...
+Yalnix     Allocated a page frame at 4A000
+Yalnix     Allocating a page frame...
+Yalnix     Allocated a page frame at 4C000
+Yalnix     Allocating a page frame...
+Yalnix     Allocated a page frame at 4E000
+Yalnix     Changed the current brk to 110000
+User Prog  HEAP found a block
+User Prog  HEAP my_malloc(0x5000)
+User Prog  HEAP found a block
+User Prog  HEAP my_malloc(0x4000)
+User Prog  HEAP not enough space, so going to try to grow
+User Prog  grow_heap(0x4000)
+User Prog  rounding up to 0x114000
+User Prog  brk_unlocked(114000)
+Yalnix     address = 114000; current_brk = 110000
+Yalnix     Allocating a page frame...
+Yalnix     Allocated a page frame at 50000
+Yalnix     Allocating a page frame...
+Yalnix     Allocated a page frame at 52000
+Yalnix     Changed the current brk to 114000
+User Prog  sbrk(0)... current = 114000
 User Prog  Running Test... PID = 2
 Yalnix     TRAP_CLOCK
 User Prog  Running Idle... PID = 1
@@ -468,5 +477,3 @@ Yalnix     TRAP_CLOCK
 User Prog  Running Idle... PID = 1
 Yalnix     TRAP_CLOCK
 User Prog  Running Test... PID = 2
-Yalnix     TRAP_CLOCK
-User Prog  Running Idle... PID = 1

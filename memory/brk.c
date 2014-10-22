@@ -13,19 +13,8 @@
 #include <string.h>
 
 #include "../core/list.h"
-#include "memory.c"
-
-
-
-
-
-/* =============================== *
-
-  	          Data
-
- * =============================== */
-
-PageTable user_page_table;
+#include "../process/process.h"
+#include "memory.h"
 
 
 
@@ -45,8 +34,8 @@ PageTable user_page_table;
 static int increaseBrk(void *address) {
 
 	// Figure out how many new frames we need to allocate
-	long frames_needed = (UP_TO_PAGE(address) - 
-		((ProcessInfo *) KERNEL_STACK_BASE)->) >> PAGESHIFT;
+	long current_brk = (long)((ProcessInfo *) KERNEL_STACK_BASE)->current_brk;
+	long frames_needed = (UP_TO_PAGE(address) - current_brk) >> PAGESHIFT;
 
 	for (int i=0; i<frames_needed; i++) {
 		// Allocate a new physical page frame, then create a PTE for it
@@ -60,11 +49,11 @@ static int increaseBrk(void *address) {
 		PTE entry = createPTEWithOptions(options, indexOfPage(frame));
 
 		// Insert the new PTE into the page table
-		long index = indexOfPage(((ProcessInfo *) KERNEL_STACK_BASE)->current_brk) + i;
-		user_page_table.entries[index] = entry;
+		long index = indexOfPage(current_brk - VMEM_1_BASE) + i;
+		getCurrentProcess()->page_table->entries[index] = entry;
+		WriteRegister(REG_TLB_FLUSH, UP_TO_PAGE(address) + PAGESIZE*i);
 	}
 
-	((ProcessInfo *) KERNEL_STACK_BASE)->current_brk = (void *) UP_TO_PAGE(address);
 	return 0;
 }
 
@@ -79,21 +68,21 @@ static int increaseBrk(void *address) {
 static int decreaseBrk(void *address) {
 
 	// Figure out how many frames we need to free
-	long frames_freed = (((ProcessInfo *) KERNEL_STACK_BASE)->current_brk - 
-		UP_TO_PAGE(address)) >> PAGESHIFT;
+	long current_brk = (long)((ProcessInfo *) KERNEL_STACK_BASE)->current_brk;
+	long frames_freed = (current_brk - UP_TO_PAGE(address)) >> PAGESHIFT;
 
 	for (int i=0; i<frames_freed; i++) {
 		// Figure out which physical frame to free
-		long pte_index = indexOfPage(UP_TO_PAGE(address)) + i;
-		long frame_index = page_table.entries[pte_index].pfn;
+		long pte_index = indexOfPage(UP_TO_PAGE(address) - VMEM_1_BASE) + i;
+		long frame_index = getCurrentProcess()->page_table->entries[pte_index].pfn;
 		void *frame = pageAtIndex(frame_index);
 
 		// Free the frame and clear the PTE
 		freePageFrame(frame);
-		user_page_table.entries[pte_index] = createPTEWithOptions(0, 0);
+		getCurrentProcess()->page_table->entries[pte_index] = createPTEWithOptions(0, 0);
+		WriteRegister(REG_TLB_FLUSH, UP_TO_PAGE(address) + PAGESIZE*i);
 	}
 
-	((ProcessInfo *) KERNEL_STACK_BASE)->current_brk = (void *) UP_TO_PAGE(address);
 	return 0;
 }
 
@@ -102,31 +91,39 @@ static int decreaseBrk(void *address) {
   Method: sets the lowest location not used by the program
 */
 
+<<<<<<< Updated upstream
 void kernelBrk(UserContext *context) {
 	void *address = context->regs[0];
 	
+=======
+int setProcessBrk(void *address) {
+	UserContext *context = &getCurrentProcess()->user_context;
+	long current_brk = (long)((ProcessInfo *) KERNEL_STACK_BASE)->current_brk;
+
+	TracePrintf(1, "address = %lX; current_brk = %lX\n", (long)address, current_brk);
+>>>>>>> Stashed changes
 	
 	if (UP_TO_PAGE(address) >= DOWN_TO_PAGE(context->sp)) {
-		TracePrintf(1, "Hey! You're trying to expand the heap into the stack!\n");
+		TracePrintf(1, "Hey, you're trying to expand the heap into the stack!\n");
 		return -1;
 	}
 
-	if(UP_TO_PAGE(address) <= ((ProcessInfo *) KERNEL_STACK_BASE)->data_start) {
-		TracePrintf(1, "Hey! You're trying to expand the heap into the data area!\n");
+	if (DOWN_TO_PAGE(address) <= (long)((ProcessInfo *) KERNEL_STACK_BASE)->heap_start) {
+		TracePrintf(1, "Hey, you're trying to shrink the heap into the data area!\n");
 		return -1;
 	}
 
-	//check whether we actually need to increase/decrease the current brk
-	if (UP_TO_PAGE(address) == ((ProcessInfo *) KERNEL_STACK_BASE)->current_brk) return 0;
+	// Check whether we actually need to increase/decrease the current brk
+	if (UP_TO_PAGE(address) == current_brk) return 0;
 
-	int status = (UP_TO_PAGE(address) > ((ProcessInfo *)KERNEL_STACK_BASE)->current_brk ?
+	int status = (UP_TO_PAGE(address) > current_brk ?
 		increaseBrk(address) :
 		decreaseBrk(address));
 
 	if (status == -1) return -1;
 
-	TracePrintf(2, "Changed the current_brk to %lX\n", 
-		((ProcessInfo *)KERNEL_STACK_BASE)->current_brk);
+	((ProcessInfo *) KERNEL_STACK_BASE)->current_brk = (void *) UP_TO_PAGE(address);
+	TracePrintf(2, "Changed the current brk to %lX\n", (void *) UP_TO_PAGE(address));
 
 	return 0;
 }
