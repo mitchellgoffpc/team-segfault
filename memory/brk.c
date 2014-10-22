@@ -91,17 +91,11 @@ static int decreaseBrk(void *address) {
   Method: sets the lowest location not used by the program
 */
 
-<<<<<<< Updated upstream
-void kernelBrk(UserContext *context) {
-	void *address = context->regs[0];
-	
-=======
 int setProcessBrk(void *address) {
 	UserContext *context = &getCurrentProcess()->user_context;
 	long current_brk = (long)((ProcessInfo *) KERNEL_STACK_BASE)->current_brk;
 
 	TracePrintf(1, "address = %lX; current_brk = %lX\n", (long)address, current_brk);
->>>>>>> Stashed changes
 	
 	if (UP_TO_PAGE(address) >= DOWN_TO_PAGE(context->sp)) {
 		TracePrintf(1, "Hey, you're trying to expand the heap into the stack!\n");
