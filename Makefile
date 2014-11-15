@@ -22,26 +22,29 @@ ALL = $(KERNEL_ALL) $(USER_APPS)
 KERNEL_ALL = yalnix
 
 
-KERNEL_PROCESS_SRCS = process/process.c process/load.c process/fork.c process/switch.c
-KERNEL_PROCESS_OBJS = process/process.o process/load.o process/fork.o process/switch.o
+KERNEL_PROCESS_SRCS = process/process.c process/load.c process/fork.c process/switch.c process/kill.c
+KERNEL_PROCESS_OBJS = process/process.o process/load.o process/fork.o process/switch.o process/kill.o
+
+KERNEL_SYNC_SRCS = sync/cvar.c sync/mutex.c sync/sync.c sync/waitqueue.c
+KERNEL_SYNC_OBJS = sync/cvar.o sync/mutex.o sync/sync.o sync/waitqueue.o
 
 
 #List all kernel source files here.  
-KERNEL_SRCS = init/init.c init/init_memory.c memory/memory.c memory/brk.c traps/traps.c $(KERNEL_PROCESS_SRCS)
+KERNEL_SRCS = init/init.c init/init_memory.c memory/memory.c memory/brk.c traps/traps.c traps/tty.c $(KERNEL_SYNC_SRCS) $(KERNEL_PROCESS_SRCS)
 #List the objects to be formed form the kernel source files here.  Should be the same as the previous list, replacing ".c" with ".o"
-KERNEL_OBJS = init/init.o init/init_memory.o memory/memory.o memory/brk.o traps/traps.o $(KERNEL_PROCESS_OBJS)
+KERNEL_OBJS = init/init.o init/init_memory.o memory/memory.o memory/brk.o traps/traps.o traps/tty.o $(KERNEL_SYNC_OBJS) $(KERNEL_PROCESS_OBJS)
 #List all of the header files necessary for your kernel
-KERNEL_INCS = core/list.h memory/memory.h traps/traps.h process/process.h
+KERNEL_INCS = core/list.h memory/memory.h traps/traps.h process/process.h sync/sync.h
 
 
 #List all user programs here.
-USER_APPS = apps/idle apps/test
+USER_APPS = apps/idle apps/test apps/torture
 #List all user program source files here.  Should be the same as the previous list, with ".c" added to each file
-USER_SRCS = apps/idle.c apps/test.c
+USER_SRCS = apps/idle.c apps/test.c apps/torture.c
 #List the objects to be formed form the user  source files here.  Should be the same as the previous list, replacing ".c" with ".o"
-USER_OBJS = apps/idle.o apps/test.o
+USER_OBJS = apps/idle.o apps/test.o apps/torture.o
 #List all of the header files necessary for your user programs
-USER_INCS = 
+USER_INCS = apps/threads.h
 
 #write to output program yalnix
 YALNIX_OUTPUT = yalnix

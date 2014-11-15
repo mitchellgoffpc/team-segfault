@@ -110,8 +110,9 @@ struct ProcessInfo {
   process.
 
   pid:          The unique ID of the process. Ranges from 0 and PID_MAX
-  state:        The current state of the process
   wake_up_time: The amount of time we need to wait for the process to wake up
+  exit_status:  The state that this process exited with
+  state:        The current state of the process
 
   info:         Some low-level information about the process. This is also a pointer
                 to the Process Control Block, in case we ever need it
@@ -141,7 +142,9 @@ struct ProcessInfo {
 
 struct ProcessDescriptor {
     PID pid;
+
     long wake_up_time;
+    long exit_status;
 
     enum ProcessState state;
     void *pcb_frames[KERNEL_STACK_MAXSIZE >> PAGESHIFT];
@@ -189,6 +192,9 @@ union ProcessControlBlock {
 #define getCurrentProcess() \
     (((ProcessInfo *) KERNEL_STACK_BASE)->descriptor)
 
+#define getIdleProcess() \
+    elementForNode(process_head.next, ProcessDescriptor, process_list)
+
 // Get the next available process ID
 #define nextAvailablePID() \
     (max_pid < LONG_MAX ? ++max_pid : 0)
@@ -227,6 +233,10 @@ union ProcessControlBlock {
         Halt(); \
     }
 
+// Check if a function returned an error
+#define checkForError(value) \
+    if (value == ERROR) { return ERROR; }
+
 
 
 
@@ -263,6 +273,7 @@ static inline void processDescriptorInit(ProcessDescriptor *process) {
 
 KernelContext* cloneKernelContext(KernelContext *context, void *a, void *b);
 KernelContext* switchKernelContext(KernelContext *context, void *a, void *b);
+KernelContext* killKernelContext(KernelContext *context, void *a, void *b);
 void schedule();
 
 
@@ -272,13 +283,18 @@ int loadProgram(char *name, char *args[]);
 
 ProcessDescriptor* createProcessDescriptor();
 void setCopyOnWrite(PageTable *table, int is_child);
-void freeAddressSpace();
+void freeAddressSpace(ProcessDescriptor *process);
 int delayProcess(int ticks);
+int waitForPID(unsigned long pid, int *status);
+
 
 int createThread();
+int joinThread(unsigned long thread_id);
 
-int killProcess(ProcessDescriptor* process);
-int killProcessWithPID(PID pid);
+
+void killCurrentProcess(int status);
+void killProcess(ProcessDescriptor *process, int status);
+void releaseProcess(ProcessDescriptor *process);
 
 
 

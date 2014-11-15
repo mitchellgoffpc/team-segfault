@@ -19,6 +19,7 @@
 #include "../memory/memory.h"
 #include "../traps/traps.h"
 #include "../process/process.h"
+#include "../sync/sync.h"
 
 
 
@@ -73,7 +74,7 @@ void initializeInterruptVector() {
   Load the init process into memory and start running it
 */
 
-void loadInit(UserContext *context) {
+void loadInit(UserContext *context, char *cmd_args[]) {
 	TracePrintf(1, "Getting read to load 'idle'...\n");
 
 	// Try to allocate space for the REGION_1 page table
@@ -105,8 +106,10 @@ void loadInit(UserContext *context) {
 
 
 	// Load init into memory and start running it
-	char *args = NULL;
-	if (loadProgram("apps/idle", &args) < 0) {
+	char *idle = "apps/idle";
+	char *name = cmd_args[0] ? cmd_args[0] : idle;
+	
+	if (loadProgram(name, cmd_args) < 0) {
 		TracePrintf(0, "Idle failed to load :(\n");
 		Halt();
 	}
@@ -173,6 +176,17 @@ void KernelStart(char *cmd_args[], unsigned int pmem_size, UserContext *context)
 	WriteRegister(REG_VM_ENABLE, 1);
 	VIRTUAL_MEMORY_ENABLED = 1;
 
+
+	// Initialize the waitqueues for the terminals
+	for (int i=0; i<NUM_TERMINALS; i++) {
+		waitQueueInit(&ttys[i].write_queue);
+		waitQueueInit(&ttys[i].read_queue);
+		ttys[i].write_current = 0;
+		ttys[i].read_buffer = 0;
+		ttys[i].read_buffer_size = 0;
+		ttys[i].read_buffer_position = 0;
+	}
+
 	// Start the init process
-	loadInit(context);
+	loadInit(context, cmd_args);
 }

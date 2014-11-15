@@ -17,6 +17,7 @@
 
 #include "../memory/memory.h"
 #include "../process/process.h"
+#include "../sync/sync.h"
 #include "traps.h"
 
 
@@ -75,8 +76,8 @@ void trapDisk(UserContext *context) {
 */
 
 void trapTtyReceive(UserContext *context) {
-    TracePrintf(1, "TRAP_TTY_RECEIVE\n");
-    // pass
+    // TracePrintf(1, "TRAP_TTY_RECEIVE\n");
+    ttyReadBegin(context->code);
 }
 
 
@@ -87,8 +88,8 @@ void trapTtyReceive(UserContext *context) {
 */
 
 void trapTtyTransmit(UserContext *context) {
-    TracePrintf(1, "TRAP_TTY_TRANSMIT\n");
-    // pass
+    // TracePrintf(1, "TRAP_TTY_TRANSMIT\n");
+    ttyWriteFinished(context->code);
 }
 
 
@@ -111,31 +112,47 @@ void trapKernel(UserContext *context) {
     int result;
 
     switch(context->code) {
+
         case YALNIX_FORK:
             result = forkProcess();
-            getCurrentProcess()->user_context.regs[0] = result;
+            register(0) = result;
             break;
         
         case YALNIX_EXEC:
-            result = loadProgram(
-                (char *) getCurrentProcess()->user_context.regs[0],
-                (char **) getCurrentProcess()->user_context.regs[1]);
-            getCurrentProcess()->user_context.regs[0] = result;
+            result = loadProgram((char *) register(0), (char **) register(1));
+            register(0) = result;
             break;
 
-        case YALNIX_GETPID:
-            getCurrentProcess()->user_context.regs[0] = getCurrentProcess()->pid;
+        case YALNIX_GETPID: register(0) = getCurrentProcess()->pid; break;
+        case YALNIX_DELAY: register(0) = delayProcess(register(0)); break;
+
+        case YALNIX_BRK: register(0) = setProcessBrk((void *) register(0)); break;
+        case YALNIX_EXIT: killCurrentProcess(register(0)); break;
+        case YALNIX_WAIT: register(0) = waitForPID(1, (int *) register(0)); break;
+
+        
+        case YALNIX_TTY_READ:
+            register(0) = ttyRead(register(0), (void *) register(1), register(2)); break;
+        case YALNIX_TTY_WRITE:
+            register(0) = ttyWrite(register(0), (void *) register(1), register(2)); break;
+
+
+        case YALNIX_LOCK_INIT: register(0) = mutexInitialize((int *) register(0)); break;
+        case YALNIX_LOCK_ACQUIRE: register(0) = mutexAcquire(register(0)); break;
+        case YALNIX_LOCK_RELEASE: register(0) = mutexRelease(register(0)); break;
+
+        case YALNIX_CVAR_INIT: register(0) = cvarInitialize((int *) register(0)); break;
+        case YALNIX_CVAR_WAIT: register(0) = cvarWait(register(0), register(1)); break;
+        case YALNIX_CVAR_SIGNAL: register(0) = cvarSignal(register(0)); break;
+        case YALNIX_CVAR_BROADCAST: register(0) = cvarBroadcast(register(0)); break;
+
+
+        case YALNIX_CUSTOM_0:
+            result = createThread();
+            register(0) = result;
             break;
 
-        case YALNIX_DELAY:
-            getCurrentProcess()->user_context.regs[0] = delayProcess(
-                getCurrentProcess()->user_context.regs[0]);
-            break;
-
-        case YALNIX_BRK:
-            getCurrentProcess()->user_context.regs[0] = setProcessBrk(
-                (void *) getCurrentProcess()->user_context.regs[0]);
-            break;
+        case YALNIX_CUSTOM_1: register(0) = joinThread(register(0)); break;
     }
 
     restoreUserContext();
@@ -156,10 +173,8 @@ void trapKernel(UserContext *context) {
 */
 
 void trapIllegal(UserContext *context) {
-    TracePrintf(1, "TRAP_ILLEGAL\n");
-    Halt();
-    // kill the current process
-    // TracePrintf(message: process ID and explanation of problem)
+    TracePrintf(1, "Process %d has received a TRAP_ILLEGAL\n", getCurrentProcess()->pid);
+    killCurrentProcess(-1);
 }
 
 
@@ -170,10 +185,8 @@ void trapIllegal(UserContext *context) {
 */
 
 void trapMath(UserContext *context) {
-    TracePrintf(1, "TRAP_MATH\n");
-    Halt();
-    // kill the process
-    // TracePrintf(message: process ID and explanation of problem)
+    TracePrintf(1, "Process %d has received a TRAP_MATH\n", getCurrentProcess()->pid);
+    killCurrentProcess(-1);
 }
 
 

@@ -64,7 +64,7 @@ typedef struct LinkedListNode LinkedListNode;
 
 
 // Test whether a list is empty
-inline int listIsEmpty(LinkedListNode *head) {
+static inline int listIsEmpty(LinkedListNode *head) {
 	return head->next == head;
 }
 

@@ -50,6 +50,13 @@ int loadProgram(char *name, char *args[]) {
 
     TracePrintf(0, "Loading program '%s'\n", name);
 
+    
+    // Check if the current process is eligable to exec
+    if (process->thread_leader > 0) {
+        TracePrintf(0, "Sorry, threads can't make calls to Exec!\n");
+        return ERROR;
+    }
+
 
     // Open the executable file and do some error checking
     if ((fd = open(name, O_RDONLY)) < 0) {
@@ -164,10 +171,10 @@ int loadProgram(char *name, char *args[]) {
     // using and clearing the page table.
     int text_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_EXEC;
     int data_options = PTE_VALID | PTE_PERM_READ | PTE_PERM_WRITE;
-    freeAddressSpace();
+    freeAddressSpace(process);
 
-    ((ProcessInfo *) KERNEL_STACK_BASE)->data_start = pageAtIndex(data_pg1) + VMEM_1_BASE;
-    ((ProcessInfo *) KERNEL_STACK_BASE)->heap_start = pageAtIndex(data_pg1 + data_npg) + VMEM_1_BASE;
+    ((ProcessInfo *) KERNEL_STACK_BASE)->data_start =  pageAtIndex(data_pg1) + VMEM_1_BASE;
+    ((ProcessInfo *) KERNEL_STACK_BASE)->heap_start =  pageAtIndex(data_pg1 + data_npg) + VMEM_1_BASE;
     ((ProcessInfo *) KERNEL_STACK_BASE)->current_brk = pageAtIndex(data_pg1 + data_npg) + VMEM_1_BASE;
 
 

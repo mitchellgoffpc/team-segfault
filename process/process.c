@@ -47,8 +47,7 @@ long max_pid = 0;
   Deallocate all of the page frames that this process is currently using.
 */
 
-void freeAddressSpace() {
-    ProcessDescriptor *process = getCurrentProcess();
+void freeAddressSpace(ProcessDescriptor *process) {
     PageTable *page_table = process->page_table;
 
     // Go through the page table and free any valid page frames
@@ -70,6 +69,8 @@ void freeAddressSpace() {
 */
 
 void setCopyOnWrite(PageTable *table, int is_child) {
+
+    TracePrintf(3, "Setting copy-on-write bit\n");
 
     int stack_base = ((long)getCurrentProcess()->user_context.sp - VMEM_1_BASE) >> PAGESHIFT;
     for (int i=0; i<stack_base; i++) {
@@ -152,4 +153,59 @@ int delayProcess(int ticks) {
     schedule();
 
     return SUCCESS;
+}
+
+
+
+
+/*
+  Wait for a child to exit before returning
+*/
+
+int waitForPID(unsigned long pid, int *status) {
+    ProcessDescriptor *current;
+
+    // Make sure we actually have some children
+    if (listIsEmpty(&getCurrentProcess()->children)) return -1;
+
+    // Loop through our children until we find a zombie
+    while (1) {
+        forEachElement(current, &getCurrentProcess()->children, siblings) {
+            if (current->state == PROCESS_ZOMBIE && (current->pid == pid || pid == 1)) goto done;
+        }
+        schedule();
+    }
+
+    // Then return its status
+    done:
+    *status = current->exit_status;
+    releaseProcess(current);
+    return 0;
+}
+
+
+
+
+/*
+  Wait for a particular child thread to exit before returning
+*/
+
+int joinThread(unsigned long thread_id) {
+    ProcessDescriptor *current;
+
+    // Make sure we actually have some child threads
+    if (listIsEmpty(&getCurrentProcess()->thread_group)) return -1;
+
+    // Loop through our child threads until we find a zombie
+    while (1) {
+        forEachElement(current, &getCurrentProcess()->thread_group, thread_peers) {
+            if (current->state == PROCESS_ZOMBIE && current->pid == thread_id) goto done;
+        }
+        schedule();
+    }
+
+    // Then return its status
+    done:
+    releaseProcess(current);
+    return 0;
 }

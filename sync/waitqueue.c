@@ -15,9 +15,9 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#include "../process/list.h"
+#include "../core/list.h"
 #include "../process/process.h"
-#include "waitqueue.h"
+#include "sync.h"
 
 
 
@@ -63,22 +63,23 @@ void addNodeToWaitQueue(WaitQueueNode *node, WaitQueue *head) {
 }
 
 // Add an exclusive process to a particular waitqueue
-int sleepOnWaitQueue(ProcessDescriptor* process, WaitQueue *head) {
-	return sleepOnWaitQueueWithOptions(process, head, 1); // defaults to exclusive
+int sleepOnWaitQueue(WaitQueue *head) {
+	return sleepOnWaitQueueWithOptions(head, 1); // defaults to exclusive
 }
 
 // Create a waitqueue node for a process and add that node to a waitqueue
-int sleepOnWaitQueueWithOptions(ProcessDescriptor* process, WaitQueue *head, int exclusive) {
+int sleepOnWaitQueueWithOptions(WaitQueue *head, int exclusive) {
 	WaitQueueNode *node = (WaitQueueNode*) malloc(sizeof(WaitQueueNode));
 	if (!node) return errno;
 
 	// Set up a new waitqueue node	
-	waitQueueNodeInit(node, process);
-	process->waitqueue = node;
+	waitQueueNodeInit(node);
+	node->is_exclusive = exclusive;
+	getCurrentProcess()->waitqueue = node;
 
 	// Add the node to the waitqueue, then put the process to sleep.
 	addNodeToWaitQueue(node, head);
-	putProcessToSleep(node->process);
+	putProcessToSleep();
 
 	return 0;
 }
@@ -97,16 +98,18 @@ void signalWaitQueue(WaitQueue *head) {
 	signalWaitQueueWithOptions(head, 1); // defaults to exclusive
 }
 
-void signalWaitQueueWithOptions(WaitQueue *head, int exclusive) {
+void signalWaitQueueWithOptions(WaitQueue *head, int wakeup_is_exclusive) {
 	WaitQueueNode *current;
 
 	// If we're doing an exclusive wakeup, start dequeueing nodes until we
 	// successfully wake up an exclusive process. Otherwise, just wake up everthing.
 	forEachElement(current, &head->head, node) {
 		removeFirstNode(&head->head);
-		int succeeded = current->prepareToWakeUp(current);
-		if (succeeded && current->is_exclusive && exclusive)
-			break;
+		
+		int node_is_exclusive = current->is_exclusive;
+		current->prepareToWakeUp(current);
+		
+		if (node_is_exclusive && wakeup_is_exclusive) break;
 	}
 }
 
@@ -117,8 +120,9 @@ void signalWaitQueueWithOptions(WaitQueue *head, int exclusive) {
   Functions to put to sleep and wake up a process
 */
 
-void putProcessToSleep(ProcessDescriptor *process) {
-	process->state = PROCESS_WAITING;
+void putProcessToSleep() {
+	getCurrentProcess()->state = PROCESS_WAITING;
+	schedule();
 }
 
 int wakeUpProcess(WaitQueueNode *node) {

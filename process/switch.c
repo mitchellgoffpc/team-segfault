@@ -89,6 +89,31 @@ KernelContext* switchKernelContext(KernelContext *context, void *a, void *b) {
 
 
 /*
+  Switch to a new kernel context
+*/
+
+KernelContext* killKernelContext(KernelContext *context, void *a, void *b) {
+	ProcessDescriptor *pa = (ProcessDescriptor *) a, *pb = (ProcessDescriptor *) b;
+	switchKernelContext(context, a, b);
+
+	// Free the page frames containing the kernel stack
+	for (int i=0; i<indexOfPage(KERNEL_STACK_MAXSIZE); i++) {
+		void *frame = pa->pcb_frames[i];
+		freePageFrame(frame);
+	}
+
+	// If the parent has already exited, remove the process descriptor
+	if (pa->thread_leader == 0 && pa->parent->pid == 1) {
+		releaseProcess(pa);
+	}
+	
+	return &pb->kernel_context;
+}
+
+
+
+
+/*
   Schedule a new process to run
 */
 
@@ -97,6 +122,7 @@ void schedule() {
 	// Figure out which process to run next
 	LinkedListNode *node = &getCurrentProcess()->process_list;
 	ProcessDescriptor *new_process;
+	
 	while (1) {
 		node = node->next;
 		if (node == &process_head) continue;
@@ -104,7 +130,7 @@ void schedule() {
 		new_process = elementForNode(node, ProcessDescriptor, process_list);
 		if (new_process->state != PROCESS_RUNNING) continue;
 		if (new_process->wake_up_time > elapsed_clock_ticks) continue;
-		
+
 		break;
 	}
 

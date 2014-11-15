@@ -49,6 +49,8 @@ Process:
 
 - fork.c: Implements forkProcess, which is called by the Fork syscall to create a duplicate of the current process
 
+- kill.c: Implements killProcess, which is called by the Exit syscall to free all data structures in use by a process
+
 - load.c: Implements loadProgram (based on template.c), which is called by the Exec syscall to overwrite the current process's address space with a new program.
 
 - process.c: A bunch of miscellaneous functions to help with managing processes.
