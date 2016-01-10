@@ -1,6 +1,16 @@
 team-segfault
 =============
 
+/* =============================== *
+
+          Project Notes
+
+ * =============================== */
+ 
+This is a project I worked on in my OS class in winter of 2015. The goal of the project was to create a miniature but functional operating system that would run on the "yalnix" emulator, which provides some utilities to help with bootstrapping, context switches and loading programs. Besides the basic requirements, we built in some additional features such as copy-on-write and lightweight processes for threading.
+
+
+
 
 
 /* =============================== *
